@@ -1,7 +1,7 @@
 # Site settings
 title: Coding!!!    # 博客标题
 SEOTitle: Cody的博客 | 漠世    #显示在浏览器上搜索的时候显示的标题
-header-img: img/post-bg-desk.jpg   #显示在首页的背景图片
+header-img: img/gratisography-ski-lift-summer.jpg   #显示在首页的背景图片
 email: 1479444143@qq.com
 description: "Every failure is leading towards success."   #网站描述
 keyword: "BY, BY Blog, cody的博客, cody, iOS, Apple, iPhone"  #关键词
@@ -12,7 +12,7 @@ github_repo: "https://github.com/yangxkniuniuniu/yangxkniuniuniu.github.io.git" 
 # Sidebar settings
 sidebar: true                           # 是否使用侧边栏
 sidebar-about-description: "Goals determine what you going to be!"
-sidebar-avatar: /img/gratisography-ski-lift-summer.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
+sidebar-avatar: /img/gratisography-421H.jpg      # use absolute URL, seeing it's used in both `/` and `/about/`
 
 
 
