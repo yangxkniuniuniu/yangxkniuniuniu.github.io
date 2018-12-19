@@ -22,11 +22,14 @@ tags:
 
 ###编写调度程序
 - 导入依赖
+
 ```
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
+
 ```
 - 设置参数
+
 ```
 from datetime import datetime, timedelta
 
@@ -45,7 +48,9 @@ default_args = {
     # 'end_date': datetime(2016, 1, 1),
 }
 ```
+
 - 实例化一个DAG
+
 ```
 t1 = BashOperator(
     task_id='print_date',
@@ -60,6 +65,7 @@ t2 = BashOperator(
     dag=dag
 )
 ```
+
 - 建立依赖关系
 `t2.set_upstream(t1)`等价于`t1.set_downstream(t2)`
 
@@ -72,6 +78,7 @@ t2 = BashOperator(
 
 ### Operator
 #### BashOperator
+
 ```
 run_this = BashOperator(
     task_id='run',
@@ -79,7 +86,9 @@ run_this = BashOperator(
     dag=dag
 )
 ```
+
 #### PythonOperator
+
 ```
 def my_python(**kwargs):
     logging.info('I am logging...')
@@ -99,6 +108,7 @@ t2 = PythonOperator(
 ```
 
 ### Variable & Connection
+
 ```
 from airflow.models import Variable, Connection
 
@@ -114,26 +124,3 @@ connect = session.query(Connection).filter(Connection.conn_id == 'local_mysql').
 
 ### Scheduling & Triggers
 `airflow trigger_dag dag_id`
-
-## java解析json文件（org.josn和gson）
-### org.json
-- 读取json
-```
-String json = "{\"name\":\"Tom\",\"age\":\"12\",\"info\":{\"id\":\"144\",\"uuid\":112}}";
-JSONObject jsonObject = new JSONObject(json);
-String name = jsonObject.getString("name");
-String age = jsonObject.getString("age");
-JSONObject object1 = jsonObject.getJSONObject("info");
-String id = object1.getString("id");
-Integer uuid = object1.getInt("uuid");
-System.out.println("name:"+name+"...age:"+age+"...info:>id:"+id+"..>uuid:"+uuid);
-```
-- 生成json
-```
-JSONObject jsonObject1 = new JSONObject();
-jsonObject1.put("title","数学");
-jsonObject1.put("score",90);
-System.out.println(jsonObject1.toString());
-```
-> 也可以使用JSONArray的方式读取和生成json
-> [详细使用方法](https://blog.csdn.net/Zen99T/article/details/50351637)

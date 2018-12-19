@@ -16,6 +16,7 @@ tags:
 ## java解析json文件（org.josn和gson）
 ### org.json
 - 读取json
+
 ```
 String json = "{\"name\":\"Tom\",\"age\":\"12\",\"info\":{\"id\":\"144\",\"uuid\":112}}";
 JSONObject jsonObject = new JSONObject(json);
@@ -26,19 +27,23 @@ String id = object1.getString("id");
 Integer uuid = object1.getInt("uuid");
 System.out.println("name:"+name+"...age:"+age+"...info:>id:"+id+"..>uuid:"+uuid);
 ```
+
 - 生成json
+
 ```
 JSONObject jsonObject1 = new JSONObject();
 jsonObject1.put("title","数学");
 jsonObject1.put("score",90);
 System.out.println(jsonObject1.toString());
 ```
+
 > 也可以使用JSONArray的方式读取和生成json
 > [详细使用方法](https://blog.csdn.net/Zen99T/article/details/50351637)
 
 ### Gson
 - 读取json
     - 生成java Bean
+
 ```
 public class MytestBean {
     public String name;
@@ -50,7 +55,9 @@ public class MytestBean {
     }
 }
 ```
+
     - 读取json文件
+
 ```
 public class JsonTest {
     public static void main(String[] args) throws  Exception{
@@ -67,7 +74,9 @@ public class JsonTest {
     }
 }
 ```
+
 - 生成json文件
+
 ```
 Writer writer = new FileWriter("/Users/cody/Desktop/test/writetest.json");
     Gson gson = new Gson();
@@ -75,9 +84,11 @@ Writer writer = new FileWriter("/Users/cody/Desktop/test/writetest.json");
     gson.toJson("123",writer);
     writer.close();
 ```
+
 ### Gson高级使用
 - 通过自定义序列化和反序列化过程来完成一些想做的事
 **SessionInfoDeserializer**
+
 ```
 public class SessionInfoDeserializer implements JsonDeserializer<SessionInfoParse> {
 
@@ -118,7 +129,9 @@ public class SessionInfoDeserializer implements JsonDeserializer<SessionInfoPars
 }
 
 ```
+
 **SessionInfoParse**
+
 ```
 ...
 @Expose
@@ -130,7 +143,9 @@ public String appInfo;
 public AppInfo app_info;
 ...
 ```
+
 **主程序,解析并发送到es**
+
 ```
 /*
     1.映射反序列化成Java对象,这个对象里的DeviceInfo,appInfo,networkInfo,userInfo是字符串类型,
@@ -181,3 +196,4 @@ public void sendMessageToEs(String message, String token) throws Exception {
     System.out.println(indexResponse.toString());
 }
 ```
+
