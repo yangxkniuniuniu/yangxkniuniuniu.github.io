@@ -1,15 +1,15 @@
 ---
 layout:     post
-title:      Git 从踩坑到不停踩坑
-subtitle:   git
+title:      Airflow 学习之路
+subtitle:   Airflow
 date:       2018-12-19
-author:     owl city / covered from BY
+author:     owl city
 header-img: img/post-bg-keybord.jpg
 catalog: true
 tags:
-    - Mac
+    - Airflow
+    - Python
     - 终端
-    - Git
 ---
 
 
