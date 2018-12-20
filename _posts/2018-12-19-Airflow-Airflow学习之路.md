@@ -15,22 +15,25 @@ tags:
 
 # airflow
 安装：`sudo pip install apache-airflow==1.9.0 --ignore-installed python-dateutil`
-### quickstart
+
+## quickstart
+### 开启airflow服务
 `airflow initdb`  初始化数据库
 `airflow webserver -p 8080` 开启网页端服务
 `airflow scheduler`  开启调度器
+`ps aux | grep airflow` 查看airflow webserver和schedual是否正常启动
 
 ###编写调度程序
 - 导入依赖
 
-```
+```python
 from airflow import DAG
 from airflow.operators.bash_operator import BashOperator
-
 ```
+
 - 设置参数
 
-```
+```python
 from datetime import datetime, timedelta
 
 default_args = {
@@ -51,7 +54,19 @@ default_args = {
 
 - 实例化一个DAG
 
+```python
+dag = DAG(
+    'user_active_log_etl',
+    schedule_interval = '0 2 * * *',
+    start_date = datetime(2018, 12, 11, 2),
+    default_args = default_args,
+    max_active_runs = 1
+  )
 ```
+
+- 定义task
+
+```python
 t1 = BashOperator(
     task_id='print_date',
     bash_command='date',
@@ -67,18 +82,33 @@ t2 = BashOperator(
 ```
 
 - 建立依赖关系
+
 `t2.set_upstream(t1)`等价于`t1.set_downstream(t2)`
+> 在新版的airflow中可以使用 `t1 > t2`来控制工作流的顺序
+### 名词解释
+`depends_on_past`:本次调度任务是否会依赖上一次任务的完成
+`start_date`: airflow调度的开始时间
+`schedual_interval`: 调度任务的时间
+`max_active_runs`: 设置任务跑失败之后的重试次数
 
 ### Testing
 模拟在某个时间段执行这个task
-`airflow test airtest start 2018-10-25`
+`airflow test airtest start '2018-10-25 02:00:00'`
 ### backfill
-回填,重新执行start->end这段时间的dag
-`airflow backfill airtest -s 2018-10-22 -e 2018-10-25`
+- 回填,重新执行start->end这段时间的dag
+`airflow backfill -s '2018-10-22' -e '2018-10-25' airflowtest`
+- 将之前的任务backfill为success
+`airflow backfill -s '2018-10-22' -e '2018-10-25' -m -I airflowtest`
+- 也可以指定task
+`airflow backfill -s '2018-10-22' -e '2018-10-25' -m -I -t start airflowtest`
+> - -s为开始时间
+> - -e 为结束时间
+> - -m make success
+> - -I 忽略依赖
+> - -t task_regex 指定需要backfill的task
 
 ### Operator
 #### BashOperator
-
 ```
 run_this = BashOperator(
     task_id='run',
@@ -86,9 +116,7 @@ run_this = BashOperator(
     dag=dag
 )
 ```
-
 #### PythonOperator
-
 ```
 def my_python(**kwargs):
     logging.info('I am logging...')
@@ -108,7 +136,6 @@ t2 = PythonOperator(
 ```
 
 ### Variable & Connection
-
 ```
 from airflow.models import Variable, Connection
 
@@ -123,4 +150,6 @@ connect = session.query(Connection).filter(Connection.conn_id == 'local_mysql').
 
 
 ### Scheduling & Triggers
-`airflow trigger_dag dag_id`
+`airflow trigger_dag dag_id` 将会去启动一个dag
+- 可以使用-e指定执行时间
+- 使用-c传入参数

@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      Gson Java中对JSON对象进行序列化和反序列化的利器
+title:      Gson:Java中对JSON对象进行序列化和反序列化的利器
 subtitle:   Gson
 date:       2018-12-19
 author:     owl city / covered from BY
@@ -16,8 +16,8 @@ tags:
 ## java解析json文件（org.josn和gson）
 ### org.json
 - 读取json
-
-```
+-
+```java
 String json = "{\"name\":\"Tom\",\"age\":\"12\",\"info\":{\"id\":\"144\",\"uuid\":112}}";
 JSONObject jsonObject = new JSONObject(json);
 String name = jsonObject.getString("name");
@@ -29,22 +29,20 @@ System.out.println("name:"+name+"...age:"+age+"...info:>id:"+id+"..>uuid:"+uuid)
 ```
 
 - 生成json
-
-```
+```java
 JSONObject jsonObject1 = new JSONObject();
 jsonObject1.put("title","数学");
 jsonObject1.put("score",90);
 System.out.println(jsonObject1.toString());
 ```
-
 > 也可以使用JSONArray的方式读取和生成json
 > [详细使用方法](https://blog.csdn.net/Zen99T/article/details/50351637)
 
 ### Gson
 - 读取json
-    - 生成java Bean
+    1. 生成java Bean
 
-```
+```java
 public class MytestBean {
     public String name;
     public String age;
@@ -55,10 +53,9 @@ public class MytestBean {
     }
 }
 ```
+    2. 读取json文件
 
-    - 读取json文件
-
-```
+```java
 public class JsonTest {
     public static void main(String[] args) throws  Exception{
         FileReader fr=new FileReader("/Users/cody/Desktop/test/mytest.json");
@@ -77,7 +74,7 @@ public class JsonTest {
 
 - 生成json文件
 
-```
+```java
 Writer writer = new FileWriter("/Users/cody/Desktop/test/writetest.json");
     Gson gson = new Gson();
     gson.toJson("hello",writer);
@@ -89,7 +86,7 @@ Writer writer = new FileWriter("/Users/cody/Desktop/test/writetest.json");
 - 通过自定义序列化和反序列化过程来完成一些想做的事
 **SessionInfoDeserializer**
 
-```
+```java
 public class SessionInfoDeserializer implements JsonDeserializer<SessionInfoParse> {
 
     @Override
@@ -132,7 +129,7 @@ public class SessionInfoDeserializer implements JsonDeserializer<SessionInfoPars
 
 **SessionInfoParse**
 
-```
+```java
 ...
 @Expose
 public String client_login_session_id;
