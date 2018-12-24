@@ -109,7 +109,7 @@ t2 = BashOperator(
 
 ### Operator
 #### BashOperator
-```
+```python
 run_this = BashOperator(
     task_id='run',
     bash_command='echo 0',
@@ -117,7 +117,7 @@ run_this = BashOperator(
 )
 ```
 #### PythonOperator
-```
+```python
 def my_python(**kwargs):
     logging.info('I am logging...')
     print('I am printing...')
@@ -136,7 +136,7 @@ t2 = PythonOperator(
 ```
 
 ### Variable & Connection
-```
+```python
 from airflow.models import Variable, Connection
 
 # get Variable
