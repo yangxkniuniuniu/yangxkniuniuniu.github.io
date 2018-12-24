@@ -4,7 +4,7 @@ title:      Docker使用秘籍
 subtitle:   Docker
 date:       2018-12-24
 author:     owl city
-header-img: img/post-bg-docker.png
+header-img: img/post-bg-water.jpg
 catalog: true
 tags:
     - Helm

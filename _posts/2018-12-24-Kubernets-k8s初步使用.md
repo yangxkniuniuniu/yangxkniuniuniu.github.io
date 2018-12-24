@@ -4,7 +4,7 @@ title:      Kubernets初步使用
 subtitle:   Kubernets
 date:       2018-12-24
 author:     owl city
-header-img: img/post-bg-kubernetes.jpg
+header-img: img/post-bg-hoolwn.jpg
 catalog: true
 tags:
     - Helm
