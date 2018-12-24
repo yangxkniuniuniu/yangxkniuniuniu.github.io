@@ -66,20 +66,20 @@ gitalk:
   clientSecret: a104e57407e26c12ef15bf566a3d15489aa7ef20    #生成的clientSecret
   repo: yangxkniuniuniu.github.io    #仓库名称
   owner: yangxkniuniuniu    #github用户名
-  admin: [yangxkniuniuniu]
+  admin: yangxkniuniuniu
   distractionFreeMode: true #是否启用类似FB的阴影遮罩
-  id: 'window.location.pathname'
+  id: window.location.pathname
 
 
 # 统计
 
 # Analytics settings
 # Baidu Analytics
-ba_track_id: b50bf2b12b5338a1845e33832976fd68
+# ba_track_id: b50bf2b12b5338a1845e33832976fd68
 
 # Google Analytics
-ga_track_id: 'UA-90855596-1'            # Format: UA-xxxxxx-xx
-ga_domain: owlcity.top               # 默认的是 auto, 这里我是自定义了的域名，你如果没有自己的域名，需要改成auto
+# ga_track_id: 'UA-90855596-1'            # Format: UA-xxxxxx-xx
+# ga_domain: owlcity.top               # 默认的是 auto, 这里我是自定义了的域名，你如果没有自己的域名，需要改成auto
 
 
 
