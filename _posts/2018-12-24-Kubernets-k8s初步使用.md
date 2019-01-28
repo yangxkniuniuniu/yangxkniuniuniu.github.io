@@ -13,7 +13,7 @@ tags:
 ---
 
 
-## Kubernetes
+# Kubernetes
 [Kubernets中文文档](https://www.kubernetes.org.cn/k8s)
 [Helm文档](https://docs.helm.sh/)
 所有容器均在Pod中运行，一个Pod可以承载一个或者多个相关的容器
@@ -50,10 +50,15 @@ kubectl命令行工具、客户端SDK以及集群联邦
 
 # Helm
 
-标签（空格分隔）： 学习笔记
 
 ---
-## [Helm中文文档](https://whmzsu.github.io/helm-doc-zh-cn/quickstart/quickstart-zh_cn.html)
+## Helm基础
+### 基础命令
+- 创建默认的Chart : `helm create mychart`
+
+- 自定义service.yaml文件时,通过`helm lint .`来检查yaml文件是否正确
+
+> [Helm中文文档](https://whmzsu.github.io/helm-doc-zh-cn/quickstart/quickstart-zh_cn.html)
 ### Helm作为Kubernetes的包管理：
 - 创建新的chart
 - chart打包成tgz
