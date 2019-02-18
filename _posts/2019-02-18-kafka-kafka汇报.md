@@ -44,11 +44,42 @@ tags:
 
 3. 删除原数据: `DELETE FROM log.sessions WHERE id <= (SELECT MAX(id) FROM log.sessions_201901);`
 
+
+
 **目标 :  在删除数据的同时不影响数据的查询**
 
 **问题:**
 测试用例: 往sessions表中插入日期为2019-01-20的100万条记录,日期为2019-01-21的100条记录
+
+- 测试数据插入
+
+```java
+while (i <= 1000000) {
+    String sql = "insert into sessions(created_at) values (\"2019-01-20 09:33:32\")";
+    st.executeUpdate(sql);
+    i++;
+    System.out.println("第" + i + "条");
+}
+```
+
+- 测试数据查询
+
+```java
+while (true) {
+    Thread.sleep(400);
+    ResultSet rs = st.executeQuery("select id from sessions where created_at > \'2019-01-21\';");
+    while (rs.next()) {
+        int id = rs.getInt(1);
+        System.out.println("id: " + id);
+    }
+}
+```
+
+
+
 - 在repeatable read 隔离级别下, jdbc先循环查询日期为2019-01-21数据, 再删除日期为2019-01-20的记录.
+
     - 删除操作等待,停止查询,删除操作能够进行
+
 
 - 切换为read committed隔离级别,再进行相同操作,删除操作未等待
