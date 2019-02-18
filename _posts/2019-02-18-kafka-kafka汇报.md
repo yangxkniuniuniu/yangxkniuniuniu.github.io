@@ -12,11 +12,15 @@ tags:
 
 ### Kafka     v1.1.1
 
+kafka服务接口地址: beta-tcp-endpoint.dev.saybot.net:31090, 31091, 31092
+
 [项目地址](https://git.saybot.net/cody.yang/k8s-kafka)
 
 ![pods](https://ws4.sinaimg.cn/large/006tKfTcgy1g0adlmz8l1j30d903vaa9.jpg)
 
 [Grafana地址](https://grafana-k8s.dev.saybot.net/d/q3Mfvnhmk/kafka-metrics-monitor?orgId=1&from=now-2d&to=now)
+
+[prometheus地址](http://prometheus-k8s.dev.saybot.net/graph)
 
 #### 待解决问题或优化方案:
 - 待解决问题: kafka-manager连接问题
