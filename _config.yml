@@ -21,7 +21,7 @@ RSS: false
 # weibo_username:
 zhihu_username:     Lion音乐家
 github_username:    yangxkniuniuniu
-facebook_username:  Xuekai Yang
+facebook_username:  xuekai.yang.5
 jianshu_username:
 #twitter_username:
 
@@ -41,7 +41,7 @@ anchorjs: true                          # if you want to customize anchor. check
 # from PR#40, to support local preview for Jekyll 3.0
 gems: [jekyll-paginate]
 
-paginate: 5
+paginate: 10
 
 
 
