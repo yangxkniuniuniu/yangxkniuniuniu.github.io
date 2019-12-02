@@ -13,7 +13,7 @@ tags:
 
 ## Java语法及使用案例
 #### Json解析(Gson)
-> **[Json解析(Gson)](http://owlcity.top/2019/10/11/Sub_Java-Gson%e7%9a%84%e4%bd%bf%e7%94%a8/)**
+> **[下层URL: Gson学习笔记](http://owlcity.top/2019/10/11/SubJava-GsonUsing/)**
 
 ## 23种设计模式的分类和功能
 #### 划分

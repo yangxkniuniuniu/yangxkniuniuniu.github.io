@@ -12,11 +12,11 @@ tags:
     - Gson
 ---
 
+> **[上层URL: <Java学习笔记>](http://owlcity.top/2019/10/11/TopJava-JavaLearning/)**
 
 ## 使用org.josn解析json文件
-    - 读取json
-    -
-    ```java
+- 读取json
+```java
     String json = "{\"name\":\"Tom\",\"age\":\"12\",\"info\":{\"id\":\"144\",\"uuid\":112}}";
     JSONObject jsonObject = new JSONObject(json);
     String name = jsonObject.getString("name");
@@ -25,17 +25,18 @@ tags:
     String id = object1.getString("id");
     Integer uuid = object1.getInt("uuid");
     System.out.println("name:"+name+"...age:"+age+"...info:>id:"+id+"..>uuid:"+uuid);
-    ```
+```
 
-    - 生成json
-    ```java
-    JSONObject jsonObject1 = new JSONObject();
-    jsonObject1.put("title","数学");
-    jsonObject1.put("score",90);
-    System.out.println(jsonObject1.toString());
-    ```
-    > 也可以使用JSONArray的方式读取和生成json
-    > [详细使用方法](https://blog.csdn.net/Zen99T/article/details/50351637)
+- 生成json
+```java
+JSONObject jsonObject1 = new JSONObject();
+jsonObject1.put("title","数学");
+jsonObject1.put("score",90);
+System.out.println(jsonObject1.toString());
+```
+
+> 也可以使用JSONArray的方式读取和生成json
+> [详细使用方法](https://blog.csdn.net/Zen99T/article/details/50351637)
 
 
 ## Gson
