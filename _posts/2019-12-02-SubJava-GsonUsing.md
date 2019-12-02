@@ -1,14 +1,15 @@
 ---
 layout:     post
-title:      Java
-subtitle:   Java学习笔记
+title:      Gson
+subtitle:   Gson学习笔记
 date:       2019-10-11
 author:     owl city
 header-img: img/post-bg-desk.jpg
 catalog: true
 tags:
     - Java
-    - 设计模式
+    - Json
+    - Gson
 ---
 
 
