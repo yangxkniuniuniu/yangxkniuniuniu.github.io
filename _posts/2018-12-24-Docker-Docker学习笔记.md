@@ -134,12 +134,12 @@ services:
 ```
 
 
-#### prometheus
+## prometheus
 启动:`./prometheus --config.file=.../prometheus.yml`
 开启kafka-exporter
 `docker run -ti --rm -p 9308:9308 danielqsj/kafka-exporter --kafka.server=192.168.121.174:9092 --kafka.server=192.168.121.174:9093 --kafka.server=192.168.121.174:9094`
 
-### 使用Dokcerfile定制镜像
+#### 使用Dokcerfile定制镜像
 - FROM指定基础镜像
 - 在有多行shell脚本时:
 
@@ -158,24 +158,25 @@ RUN buildDeps='gcc libc6-dev make' \
 在将文件复制进镜像时:
 `COPY ./package.json /app/`的意思是将上下文路径下的这个json文件复制到镜像中
 在有不想上传到Docker引擎的文件时,可以使用跟`.gitignore`一样的语法写一个`.dockerignore`
-#### 其他`docker build`的用法
-- 直接使用Git repo进行构建
-`docker build https://github.com/twang2218/gitlab-ce-zh.git#:8.14`
-- 用给定的tar包进行构建
-`docker build http://server/context.tar.gz`
 
-### Dockerfile指令详解
-- COPY复制文件
-格式 `COPY <源路径>  <目标路径>`
+- 其他`docker build`的用法
+    - 直接使用Git repo进行构建
+    `docker build https://github.com/twang2218/gitlab-ce-zh.git#:8.14`
+    - 用给定的tar包进行构建
+    `docker build http://server/context.tar.gz`
 
-- ADD更高级的复制文件
-格式和性质和COPY基本一致,再上面增加了一些功能
-<源路径>可以是一个URL,Docker引擎会试图下载这个链接的文件到目标路径下去,下载后的文件权限自动设置为`600`
+- Dockerfile指令详解
+    - COPY复制文件
+    格式 `COPY <源路径>  <目标路径>`
 
-- CMD容器启动命令
-CMD指令的格式和RUN相似:
-    - shell格式:`CMD <命令>`
-    - exec格式:`CMD ["可执行文件", "参数1", "参数2" ...]`
-容器是进程,在启动容器的时候需要指定容器运行的程序和参数,CMD就是用来指定默认的容器的主进程的启动命令.
-列:ubuntu镜像默认的CMD是`/bin/bash`,如果直接使用`docker run -it ubuntu`会直接进入bash,也可以在后面添加指令来完成其他动作.
-***一般推荐用exec格式***
+    - ADD更高级的复制文件
+    格式和性质和COPY基本一致,再上面增加了一些功能
+    <源路径>可以是一个URL,Docker引擎会试图下载这个链接的文件到目标路径下去,下载后的文件权限自动设置为`600`
+
+    - CMD容器启动命令
+    CMD指令的格式和RUN相似:
+        - shell格式:`CMD <命令>`
+        - exec格式:`CMD ["可执行文件", "参数1", "参数2" ...]`
+    容器是进程,在启动容器的时候需要指定容器运行的程序和参数,CMD就是用来指定默认的容器的主进程的启动命令.
+    列:ubuntu镜像默认的CMD是`/bin/bash`,如果直接使用`docker run -it ubuntu`会直接进入bash,也可以在后面添加指令来完成其他动作.
+    ***一般推荐用exec格式***
