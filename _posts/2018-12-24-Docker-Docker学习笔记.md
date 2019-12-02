@@ -1,7 +1,7 @@
 ---
 layout:     post
-title:      Docker使用秘籍
-subtitle:   Docker
+title:      Docker
+subtitle:   Docker学习笔记
 date:       2018-12-24
 author:     owl city
 header-img: img/post-bg-water.jpg

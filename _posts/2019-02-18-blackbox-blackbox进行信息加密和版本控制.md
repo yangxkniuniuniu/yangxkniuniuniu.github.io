@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      blackbox进行信息加密与版本管理
+title:      blackbox配合git进行信息加密与版本管理
 subtitle:   blackbox
 date:       2019-04-18
 author:     owl city

@@ -1,7 +1,7 @@
 ---
 layout:     post
-title:      Mysql锁机制
-subtitle:   Mysql
+title:      Mysql
+subtitle:   Mysql学习笔记
 date:       2019-01-28
 author:     owl city
 header-img: img/post-bg-kuaidi.jpg

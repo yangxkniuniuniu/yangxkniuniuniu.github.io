@@ -1,7 +1,7 @@
 ---
 layout:     post
-title:      Kubernets初步使用
-subtitle:   Kubernets
+title:      Kubernets
+subtitle:   k8s学习笔记
 date:       2018-12-24
 author:     owl city
 header-img: img/post-bg-cook.jpg
@@ -13,26 +13,28 @@ tags:
 ---
 
 
-# Kubernetes
-[Kubernets中文文档](https://www.kubernetes.org.cn/k8s)
-[Helm文档](https://docs.helm.sh/)
-所有容器均在Pod中运行，一个Pod可以承载一个或者多个相关的容器
+## Kubernetes
+- [Kubernets中文文档](https://www.kubernetes.org.cn/k8s)
+
+- 所有容器均在Pod中运行，一个Pod可以承载一个或者多个相关的容器
+
 ![Kubernetes设计架构](https://raw.githubusercontent.com/kubernetes/kubernetes/release-1.2/docs/design/architecture.png)
+
 ### 核心组件
-- etcd 保存整个集群的状态
-- apiserver提供了资源操作的唯一入口
-- controller manager负责维护集群的状态
-- scheduler负责资源的调度，按照预定的调度策略将Pod调度到相应的机器上
-- kubelet负责维护容器的生命周期，同时也负责镜像、Volume(CVI)和网络(CNI)的管理
-- Container runtime负责镜像管理以及Pod和容器的真正运行(CRI）
-- kube-proxy负责为Service提供cluster内部的服务发现和负载均衡
+- `etcd` 保存整个集群的状态
+- `apiserver` 提供了资源操作的唯一入口
+- `controller manager` 负责维护集群的状态
+- `scheduler` 负责资源的调度，按照预定的调度策略将Pod调度到相应的机器上
+- `kubelet` 负责维护容器的生命周期，同时也负责镜像、Volume(CVI)和网络(CNI)的管理
+- `Container runtime` 负责镜像管理以及Pod和容器的真正运行(CRI）
+- `kube-proxy` 负责为Service提供cluster内部的服务发现和负载均衡
 ### 其他组件
-- kube-dns 负责为整个集群提供DNS服务
-- Ingress Controller为服务提供外网入口
-- Heapster 提供资源监控
-- Dashboard 提供GUI
-- Federation 提供跨可用区的集群
-- Fluentd-elasticsearch提供集群日志采集，存储与查询
+- `kube-dns` 负责为整个集群提供DNS服务
+- `Ingress Controller` 为服务提供外网入口
+- `Heapster` 提供资源监控
+- `Dashboard` 提供GUI
+- `Federation` 提供跨可用区的集群
+- `Fluentd-elasticsearch` 提供集群日志采集，存储与查询
 
 ## 分层架构
 - 核心层
@@ -48,34 +50,35 @@ kubectl命令行工具、客户端SDK以及集群联邦
  - Kubernetes内部：CRI、CNI、CVI、镜像仓库等
 
 
-# Helm
+## Helm
+- [Helm文档](https://docs.helm.sh/)
 
+- [Helm中文文档](https://whmzsu.github.io/helm-doc-zh-cn/quickstart/quickstart-zh_cn.html)
 
----
-## Helm基础
-### 基础命令
+### Helm基础
+#### 基础命令
 - 创建默认的Chart : `helm create mychart`
 
 - 自定义service.yaml文件时,通过`helm lint .`来检查yaml文件是否正确
 
-> [Helm中文文档](https://whmzsu.github.io/helm-doc-zh-cn/quickstart/quickstart-zh_cn.html)
-### Helm作为Kubernetes的包管理：
+
+#### Helm作为Kubernetes的包管理：
 - 创建新的chart
 - chart打包成tgz
 - 上传chart到chart仓库或者从仓库下载chart
 - 在Kubernetes集群中安装或者卸载chart
 - 管理Helm安装的chart的发布周期
 
-### Helm的三个重要概念：
+#### Helm的三个重要概念：
 - chart:包含了创建Kubernetes的一个应用实例的必要信息
 - config:包含了应用发布配置信息
 - release:是一个chart及其配置的一个运行实例
 
-### Helm组件
+#### Helm组件
 - Helm Client
 - Tiller server
 
-## chart
+### chart
 chart是描述相关的一组Kuberbetes资源的文件集合，通过创建为特定目录树的文件，将它们打包到版本化的压缩包，然后进行部署。
 #### Helm结构目录树：
 
@@ -224,7 +227,7 @@ Templates目录下是yaml文件的模板
 
 使用`helm install --values=myvalues.yaml kafka-ops` 这个yaml文件会被合并到默认values文件中,如果value.yaml中存在相同key则覆盖
 
-## StatefulSet
+### StatefulSet
 -  一个Headless Service,名称为ngnix，用来控制网络
 -  StatefulSet,名称为web,用Spec来指明有3个ngnix容器被启动在单独的Pod中。
 -  volumeClaimTemplates通过使用PersistentVolumes提供stable storge
