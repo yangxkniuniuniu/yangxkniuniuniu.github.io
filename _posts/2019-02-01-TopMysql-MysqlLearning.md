@@ -2,7 +2,7 @@
 layout:     post
 title:      Mysql
 subtitle:   Mysql学习笔记
-date:       2019-01-28
+date:       2019-02-01
 author:     owl city
 header-img: img/post-bg-kuaidi.jpg
 catalog: true
@@ -11,6 +11,9 @@ tags:
     - 锁机制
     - 并发
 ---
+
+> - Create Date: 2019-12-03
+> - Update Date: 2019-12-03
 
 ## Mysql锁
 

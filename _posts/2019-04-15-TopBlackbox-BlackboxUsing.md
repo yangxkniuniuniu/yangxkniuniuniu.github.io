@@ -2,7 +2,7 @@
 layout:     post
 title:      blackbox配合git进行信息加密与版本管理
 subtitle:   blackbox
-date:       2019-04-18
+date:       2019-04-15
 author:     owl city
 header-img: img/post-bg-kuaidi.jpg
 catalog: true
@@ -12,6 +12,9 @@ tags:
     - encrypt
     - gitlab ci
 ---
+
+> - Create Date: 2019-12-03
+> - Update Date: 2019-12-03
 
 #### 背景
 **存在问题:**

@@ -2,7 +2,7 @@
 layout:     post
 title:      Docker
 subtitle:   Docker学习笔记
-date:       2018-12-24
+date:       2019-03-01
 author:     owl city
 header-img: img/post-bg-water.jpg
 catalog: true
@@ -12,6 +12,8 @@ tags:
     - Docker
 ---
 
+> - Create Date: 2019-12-03
+> - Update Date: 2019-12-03
 
 ## Docker
 - 在一个空文件夹下创建Dockerfile,app.py,requirement.txt,内容可从官网复制粘贴过来。

@@ -2,7 +2,7 @@
 layout:     post
 title:      大数据
 subtitle:   大数据学习笔记
-date:       2018-12-24
+date:       2019-01-01
 author:     owl city
 header-img: img/post-bg-lamplight.jpg
 catalog: true
@@ -11,6 +11,10 @@ tags:
     - 大数据
     - 分布式
 ---
+
+> - Create Date: 2019-12-03
+> - Update Date: 2019-12-03
+
 ## Hadoop
 
 > **[下层URL: Hadoop学习笔记](http://owlcity.top/2020/01/01/SubBigData-Hadoop/)**

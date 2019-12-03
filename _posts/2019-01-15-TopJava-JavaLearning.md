@@ -2,7 +2,7 @@
 layout:     post
 title:      Java
 subtitle:   Java学习笔记
-date:       2019-10-11
+date:       2019-01-15
 author:     owl city
 header-img: img/post-bg-desk.jpg
 catalog: true
@@ -11,9 +11,12 @@ tags:
     - 设计模式
 ---
 
+> - Create Date: 2019-12-03
+> - Update Date: 2019-12-03
+
 ## Java语法及使用案例
 #### Json解析(Gson)
-> **[下层URL: Gson学习笔记](http://owlcity.top/2019/10/11/SubJava-GsonUsing/)**
+> **[下层URL: Gson学习笔记](http://owlcity.top/2020/01/15/SubJava-GsonUsing/)**
 
 ## 23种设计模式的分类和功能
 #### 划分

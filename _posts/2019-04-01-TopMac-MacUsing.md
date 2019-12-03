@@ -2,7 +2,7 @@
 layout:     post
 title:      Mac
 subtitle:   Mac实用技巧
-date:       2019-01-28
+date:       2019-04-01
 author:     owl city
 header-img: img/post-bg-kuaidi.jpg
 catalog: true
@@ -11,6 +11,9 @@ tags:
     - zsh
     - tmux
 ---
+
+> - Create Date: 2019-12-03
+> - Update Date: 2019-12-03
 
 ## 丰富终端的应用：
 > **[Awesome Mac! Mac精品应用](https://wangchujiang.com/awesome-mac/index.zh.html)**

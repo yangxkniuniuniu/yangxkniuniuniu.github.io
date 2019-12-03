@@ -2,7 +2,7 @@
 layout:     post
 title:      Git
 subtitle:   Git学习
-date:       2018-12-19
+date:       2019-02-15
 author:     owl city
 header-img: img/post-bg-map.jpg
 catalog: true
@@ -11,6 +11,9 @@ tags:
     - CI
     - Docker
 ---
+
+> - Create Date: 2019-12-03
+> - Update Date: 2019-12-03
 
 ## Git基础
 #### 基础命令

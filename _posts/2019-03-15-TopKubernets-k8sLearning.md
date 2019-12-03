@@ -2,7 +2,7 @@
 layout:     post
 title:      Kubernets
 subtitle:   k8s学习笔记
-date:       2018-12-24
+date:       2019-03-15
 author:     owl city
 header-img: img/post-bg-cook.jpg
 catalog: true
@@ -12,6 +12,8 @@ tags:
     - Docker
 ---
 
+> - Create Date: 2019-12-03
+> - Update Date: 2019-12-03
 
 ## Kubernetes
 - [Kubernets中文文档](https://www.kubernetes.org.cn/k8s)
