@@ -1,7 +1,7 @@
 ---
 layout:     post
-title:      大数据
-subtitle:   大数据学习笔记
+title:      Hadoop
+subtitle:   Hadoop学习笔记
 date:       2018-12-24
 author:     owl city
 header-img: img/post-bg-lamplight.jpg
@@ -11,12 +11,14 @@ tags:
     - 大数据
     - 分布式
 ---
-## Hadoop
-#### Hadoop安装与部署
+
+> **[上层URL: 大数据学习笔记](http://owlcity.top/2019/01/01/TopBigData-BigDataLearning/)**
+
+## Hadoop安装与部署
 
 **这里先介绍本地模式的安装与使用**
 
-###### 本地模式安装
+#### 本地模式安装
 1. 配置Java
 2. 官网下载hadoop的压缩包,然后在相应目录下解压缩: `tar -xzvf ...`
 3. 修改配置文件
@@ -145,28 +147,10 @@ tags:
 7. 接下来可以使用webserver查看hadoop的应用和hdfs的情况
 > 注意,在登录hdfs的web UI时,使用50070不行的话,可以使用9870,在3.0版本的hdfs访问端口发生了改变
 
-#### Hadoop操作
-######  HDFS操作
+## Hadoop操作
+####  HDFS操作
 - 查看文件列表 `hadoop fs -ls /`
 - 创建文件目录 `hadoop fs -mkdir /tmp`
 - 删除文件 `hadoop fs -rm /tmp/data` , 删除目录 `hadoop fs -rmr /tmp`
 - 上传文件 `hadoop fs -put ... /tmp/...`
 - 下载文件 `hadoop fs -get /tmp/... ...`
-
-
-## Kafka
-#### 本地安装与部署
-- 环境要求：java环境，brew工具
-    - 1.brew install kafka
-    - 2.启动kafka(kafka依赖zookeepee,需先启动zookeeper)：
-        ```shell
-        zookeeper-server-start /usr/local/etc/kafka/zookeeper.properties & kafka-server-start /usr/local/etc/kafka/server.properties
-        ```
-
-    - 3.创建topic：kafka-topic-create -zookeeper localhost:2181 -replication-factor 1 -partitions 1 -topic test
-    - 4.发送消息： kafka-console-producer -broker-list localhost:9092 -topic test
-    - 5.消费消息：kafka-console-consumer -bootstrap-server localhost:9092 -topic test -from-beginning
-
-## Spark
-
-## Flink

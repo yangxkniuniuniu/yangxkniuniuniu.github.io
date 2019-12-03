@@ -12,7 +12,7 @@ tags:
     - Gson
 ---
 
-> **[上层URL: <Java学习笔记>](http://owlcity.top/2019/10/11/TopJava-JavaLearning/)**
+> **[上层URL: Java学习笔记](http://owlcity.top/2019/10/11/TopJava-JavaLearning/)**
 
 ## 使用org.josn解析json文件
 - 读取json
