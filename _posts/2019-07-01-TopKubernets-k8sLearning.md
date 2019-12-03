@@ -2,7 +2,7 @@
 layout:     post
 title:      Kubernets
 subtitle:   k8s学习笔记
-date:       2019-03-15
+date:       2019-07-01
 author:     owl city
 header-img: img/post-bg-cook.jpg
 catalog: true

@@ -2,7 +2,7 @@
 layout:     post
 title:      blackbox配合git进行信息加密与版本管理
 subtitle:   blackbox
-date:       2019-04-15
+date:       2019-05-01
 author:     owl city
 header-img: img/post-bg-kuaidi.jpg
 catalog: true
@@ -18,7 +18,7 @@ tags:
 
 #### 背景
 **存在问题:**
-    - edw配置文件(db连接信息)统计管理较为繁琐, 团队某一成员修改配置后, 其他成员需要手动进行同步
+    - edw配置文件(db连接信息)管理较为繁琐, 团队某一成员修改配置后, 其他成员需要手动进行同步
 
     - 升级后的airflow在同步配置文件时, 也需要人为手动更新,与自动化部署思想相左
 

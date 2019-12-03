@@ -2,7 +2,7 @@
 layout:     post
 title:      Gson
 subtitle:   Gson学习笔记
-date:       2020-01-15
+date:       2015-11-01
 author:     owl city
 header-img: img/post-bg-desk.jpg
 catalog: true
@@ -15,7 +15,7 @@ tags:
 > - Create Date: 2019-12-03
 > - Update Date: 2019-12-03
 
-> **[上层URL: Java学习笔记](http://owlcity.top/2019/10/11/TopJava-JavaLearning/)**
+> **[上层URL: Java学习笔记](http://owlcity.top/2019/11/01/TopJava-JavaLearning/)**
 
 ## 使用org.josn解析json文件
 - 读取json

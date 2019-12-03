@@ -1,8 +1,8 @@
 ---
 layout:     post
-title:      Hadoop
-subtitle:   Hadoop学习笔记
-date:       2020-01-02
+title:      Kafka
+subtitle:   Kafka学习笔记
+date:       2015-01-02
 author:     owl city
 header-img: img/post-bg-lamplight.jpg
 catalog: true
@@ -15,7 +15,7 @@ tags:
 > - Create Date: 2019-12-03
 > - Update Date: 2019-12-03
 
-> **[上层URL: 大数据学习笔记](http://owlcity.top/2019/01/01/TopBigData-BigDataLearning/)**
+> **[上层URL: 大数据学习笔记](http://owlcity.top/2019/12/01/TopBigData-BigdataLearning/)**
 
 ## Kafka
 #### 本地安装与部署

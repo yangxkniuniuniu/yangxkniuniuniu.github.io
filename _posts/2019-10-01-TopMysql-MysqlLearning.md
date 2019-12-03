@@ -2,7 +2,7 @@
 layout:     post
 title:      Mysql
 subtitle:   Mysql学习笔记
-date:       2019-02-01
+date:       2019-10-01
 author:     owl city
 header-img: img/post-bg-kuaidi.jpg
 catalog: true

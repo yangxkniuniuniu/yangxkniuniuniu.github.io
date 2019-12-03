@@ -2,7 +2,7 @@
 layout:     post
 title:      Mac
 subtitle:   Mac实用技巧
-date:       2019-04-01
+date:       2019-06-01
 author:     owl city
 header-img: img/post-bg-kuaidi.jpg
 catalog: true

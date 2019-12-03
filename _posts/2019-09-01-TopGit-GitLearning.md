@@ -2,7 +2,7 @@
 layout:     post
 title:      Git
 subtitle:   Git学习
-date:       2019-02-15
+date:       2019-09-01
 author:     owl city
 header-img: img/post-bg-map.jpg
 catalog: true
