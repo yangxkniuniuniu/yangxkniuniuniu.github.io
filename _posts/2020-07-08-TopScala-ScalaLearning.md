@@ -97,14 +97,11 @@ class Person{
 ```
 
 - 包对象,每个包都可以有一个包对象,需要在父包中定义,且名称和子包一样
-code:
 ```java
 package com.host.impatient
-
 package object people {
 	val defaultName = "Mark"
 }
-
 package people {
 	class Person {
 		var name = defaultName //可以直接从包对象拿到常量
@@ -113,14 +110,11 @@ package people {
 ```
 
 - 包引入
-code:
 ```java
 // 引入包中的几个成员
 import java.awt.{Color, Font}
-
 // 重命名
 import java.util.{HashMap => JavaHashMap}
-
 // 隐藏包成员
 import java.util.{HashMap => _, _}
 ```
@@ -139,16 +133,14 @@ trait LoggerException extends ConsoleLogger {
 #### 基础三
 
 - 读取文件
-code:
+scala并没有提供读取二进制文件和写文件的方法，需要通过java类库
 ```java
 import scala.io.Source
-
 val source = Sorce.fromFile("aa.txt", "UTF-8")
 val lines = source.getLines()
 for (line <- lines) println(line)
 source.close()
 ```
-scala并没有提供读取二进制文件和写文件的方法，需要通过java类库
 
 - 与shell交互
 ```java
