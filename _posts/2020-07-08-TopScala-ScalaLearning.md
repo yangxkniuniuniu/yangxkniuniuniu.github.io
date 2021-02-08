@@ -96,7 +96,8 @@ class Person{
 }
 ```
 
-- 包对象,每个包都可以有一个包对象,需要在父包中定义，且名称和子包一样
+- 包对象,每个包都可以有一个包对象,需要在父包中定义,且名称和子包一样
+code:
 ```java
 package com.host.impatient
 
@@ -112,6 +113,7 @@ package people {
 ```
 
 - 包引入
+code:
 ```java
 // 引入包中的几个成员
 import java.awt.{Color, Font}
@@ -137,6 +139,7 @@ trait LoggerException extends ConsoleLogger {
 #### 基础三
 
 - 读取文件
+code:
 ```java
 import scala.io.Source
 
