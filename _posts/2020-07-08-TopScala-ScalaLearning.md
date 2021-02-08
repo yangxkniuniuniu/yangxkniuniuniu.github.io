@@ -12,7 +12,7 @@ tags:
 ---
 
 > - Create Date: 2020-07-08
-> - Update Date: 2020-07-08
+> - Update Date: 2021-02-08
 
 ## 快学scala
 
@@ -97,7 +97,6 @@ class Person{
 ```
 
 - 包对象,每个包都可以有一个包对象,需要在父包中定义，且名称和子包一样
-
 ```java
 package com.host.impatient
 
@@ -113,7 +112,6 @@ package people {
 ```
 
 - 包引入
-
 ```java
 // 引入包中的几个成员
 import java.awt.{Color, Font}
@@ -139,7 +137,6 @@ trait LoggerException extends ConsoleLogger {
 #### 基础三
 
 - 读取文件
-
 ```java
 import scala.io.Source
 
@@ -151,14 +148,12 @@ source.close()
 scala并没有提供读取二进制文件和写文件的方法，需要通过java类库
 
 - 与shell交互
-
 ```java
 import scala.sys.process._
 "ls -al .".!
 ```
 
 - 在scala中使用正则表达式
-
 ```java
 import scala.util.matching.Regex
 val numPattern = "[0-9]+".r
