@@ -63,7 +63,7 @@ try {
 	- 案例类在比较的时候是按值比较而非按引用比较
 
 
-#### 基础二（类）
+#### 基础二（类、对象、包、继承、特质）
 - 类的getter与setter
 在scala中方法名表示为`age`和`age_`，调用时直接`val myAge = person.age; person.age = 10`
 
@@ -94,6 +94,69 @@ class Person{
 		this.age = age
 	}
 }
+```
+
+- 包对象,每个包都可以有一个包对象,需要在父包中定义，且名称和子包一样
+```java
+package com.host.impatient
+
+package object people {
+	val defaultName = "Mark"
+}
+
+package people {
+	class Person {
+		var name = defaultName //可以直接从包对象拿到常量
+	}
+}
+```
+
+- 包引入
+```java
+// 引入包中的几个成员
+import java.awt.{Color, Font}
+
+// 重命名
+import java.util.{HashMap => JavaHashMap}
+
+// 隐藏包成员
+import java.util.{HashMap => _, _}
+```
+
+- 特质构造顺序：1. 首先调用超类的构造器 2.特质构造器在超类构造器之后、类构造器之前执行 3.特质由左到右被构造 4.在每个特质中，父特质先被构造 5. 如果多个特质共有一个父特质，而父特质已经被构造，则该父特质不会被再次构造 6.所有特质构造完毕，子类被构造
+
+- 特质的自身类型
+```java
+// 此特质只能被混入指定类型的子类
+trait LoggerException extends ConsoleLogger {
+	this: Exception =>
+		def log() {log(getMessage())}
+}
+```
+
+#### 基础三
+- 读取文件
+```java
+import scala.io.Source
+
+val source = Sorce.fromFile("aa.txt", "UTF-8")
+val lines = source.getLines()
+for (line <- lines) println(line)
+source.close()
+```
+scala并没有提供读取二进制文件和写文件的方法，需要通过java类库
+
+- 与shell交互
+```java
+import scala.sys.process._
+"ls -al .".!
+```
+
+- 在scala中使用正则表达式
+```java
+import scala.util.matching.Regex
+val numPattern = "[0-9]+".r
+val matchedArr = numPatten.findAllIn("99 human").toArray
 ```
 
 #### scala泛型
