@@ -155,6 +155,54 @@ val numPattern = "[0-9]+".r
 val matchedArr = numPatten.findAllIn("99 human").toArray
 ```
 
+- scala闭包
+闭包是指在变量不再处于作用域内的时候被调用，上示例
+```java
+def mulBy(factor: Double) = (x: Double) => factor * x
+val test1 = mubBy(1)
+val test2 = mubBy(2)
+// mubBy函数在两次被调用的时候，factor均会被赋值而产生新的函数，在新的函数体内被调用，像mulBy这样的函数称为闭包(closure)
+```
+
+- scala柯里化
+是指将原来接收两个参数的函数编程新的接收一个参数的函数的过程，新的函数返回一个以原有的第二个参数作为参数的函数
+
+- 控制抽象
+在scala中，可以将一系列语句归组成不带参数也没有返回值的函数，示例：
+```java
+def until(condition: => Boolean)(block: => Unit) {
+	if (!condition) {
+		block
+		until(condition)(block)
+	}
+}
+// 下面是使用until的示例
+var x = 10
+until (x == 0) {
+	x -= 1
+	println(x)
+}
+``` 
+
+#### 集合
+![mutable_map](https://tva1.sinaimg.cn/large/008eGmZEgy1gnyvvmk0nbj30qa0j6gma.jpg)
+
+#### code练习
+- 如何使用reduceLeft得到数组中的最大元素?
+```java
+val aa = List(10, 23, 12, 34, 7, 54, 3, 23, 77, 12, 4, 5)
+aa.reduceLeft((a, b) => if (a>b) a else b) // 返回77
+```
+
+- 编写函数largest(fun: (Int)=> Int, inputs : Seq[Int])，输出在给定 输入序列中给定函数的最大值。 举例来说， largest(x => 10 * x - x * x,
+1 to 10)应该返回25。 不得使用循环或递归。
+```java
+def largest(fun: (Int) => Int, inputs: Seq[Int]): Int = {
+	val maxValue = inputs.reduceLeft((a, b) => if (fun(a) > fun(b)) a else b)
+	fun(maxValue)
+ }
+```
+
 #### scala泛型
 - 类型边界限定分为上边界和下边界来对类进行限制
 
