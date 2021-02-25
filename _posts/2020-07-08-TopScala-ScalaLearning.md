@@ -130,7 +130,7 @@ trait LoggerException extends ConsoleLogger {
 }
 ```
 
-#### 基础三
+#### 基础三（正则、高阶函数）
 
 - 读取文件
 scala并没有提供读取二进制文件和写文件的方法，需要通过java类库
@@ -184,8 +184,12 @@ until (x == 0) {
 }
 ``` 
 
-#### 集合
+#### 基础四（集合）
+- Mutable集合继承关系图
 ![mutable_map](https://tva1.sinaimg.cn/large/008eGmZEgy1gnyvvmk0nbj30qa0j6gma.jpg)
+
+- 集合用来添加和移除元素的操作符
+![集合操作符](https://tva1.sinaimg.cn/large/008eGmZEgy1gnyw89fvw3j30ta0uyneu.jpg)
 
 #### code练习
 - 如何使用reduceLeft得到数组中的最大元素?
