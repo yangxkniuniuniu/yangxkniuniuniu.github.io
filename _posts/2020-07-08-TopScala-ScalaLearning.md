@@ -184,12 +184,107 @@ until (x == 0) {
 }
 ``` 
 
-#### 基础四（集合）
+#### 基础四（集合、模式匹配、案例类）
 - Mutable集合继承关系图
 ![mutable_map](https://tva1.sinaimg.cn/large/008eGmZEgy1gnyvvmk0nbj30qa0j6gma.jpg)
 
 - 集合用来添加和移除元素的操作符
 ![集合操作符](https://tva1.sinaimg.cn/large/008eGmZEgy1gnyw89fvw3j30ta0uyneu.jpg)
+
+- 模式匹配
+```java
+// 类型模式匹配
+obj match {
+	case x: Int => x
+	case s: String => s
+	case _: Bigint => Int.MaxValue
+	case _ => 0
+}
+// 数组模式匹配
+arr match {
+	case Array(0) => "0"
+	case Array(x, y) => s"$x, $y"
+	case Array(0, _*) => s"${_.min}"
+	case _ => "else"
+}
+// 如果要将匹配到的_*可边长参数绑定到变量，可以使用@来表示
+case Array(x, rest @ _*) => rest.min
+```
+
+- 变量声明中的模式
+```java
+val arr = Array(0, 1, 2, 3, 4)
+val Array(x, y, rest @ _*) = arr
+// 返回
+val x: Int = 1
+val y: Int = 2
+val rest: Seq[Int] = ArraySeq(3, 4, 5)
+```
+
+- 偏函数
+被包在花括号内的一组case语句是一个偏函数--一个并非对所有输入值都有定义的函数。它是PartitalFuntion[A, B]类的一个示例（A是参数类型，B是返回类型）。该类有两个方法: apply方法从匹配到的模式计算函数值，而isDefinedAt方法在输入至少匹配其中一个模式时返回true
+例如：
+```java
+val f:PartitionFunction[Char, Int] = { caxse '+' => 1; case '-' => 1 }
+f('-') // 调用f.apply('-') 返回-1
+f.isDefinedAt('0') // false
+f('0') // 抛出MatchError
+```
+
+#### 基础五（类型参数）
+- 泛型： 类型边界限定分为上边界和下边界来对类进行限制
+上边界：泛型的类型必须是某种类型或者某种类型的**子类**，语法为`<:`
+下边界：泛型的类型必须是某种类型或者某种类型的**父类**，语法为`>:`
+
+- 视图界定(未来被弃用，可用类型约束替换，见下文)：
+`T <& V`要求必须存在一个从T到V的隐式转换
+```java
+// 使用<%意味着T可以被隐式转换为Comparable[T]
+class Pair[T <% Comparable[T]]
+```
+
+- 上下文界定: `T : M`其中M是另一个泛型类，它要求必须存在一个类型为M[T]的隐式值
+如:
+例1：
+```java
+class Pair(T : Ordering)
+```
+上述定义要求必须存在一个类型为`Ordering[T]`的隐式值，该隐式值可以被用在该类的方法中。当声明一个使用隐式值的方法时，需要添加一个隐式参数，如下：
+```java
+class Pair[T : Ordring](val first: T, val second: T) {
+	def smaller(implicit ord: Ordring[T]) = if (ord.compare(first, second) < 0 first else second)
+}
+```
+例2：
+```java
+object MyTest {
+	def main(args: Array[String]): Unit = {
+		implicit val c = new Comparator[Int] {
+			override def compare(o1: Int, o2: Int): Int = o1 - o2
+		}
+		// 如果上下文中存在Comparator[Int]这样的隐式值，下面的语句就可以正常执行
+		println(cusMax2(10, 4))
+	}
+	def cusMax1[T](a: T, b: T)(implicit cp: Comparator[T]): T = {
+		if (cp.compare(a, b) > 0) a else b
+	}
+	// 上面的方法也可以写成
+	def cusMax2[T : Comparator](a: T, b: T): T = {
+		val cp = implicitly[Comparator[T]]
+		if (cp.compare(a, b) > 0) a else b
+	}
+}
+```
+
+- ClassTag上下文界定
+ClassTag[T]保存着在运行时被JVM擦除的类型T的信息，可以在运行时获得传递的类型参数的信息
+> jvm类型擦除
+Java中的泛型基本上都是在编译器这个层次来实现的。在生成的Java字节码中是不包含泛型中的类型信息的。使用泛型的时候加上的类型参数，会在编译器在编译的时候去掉，保留原始类型。这个过程就称为类型擦除。原始类型（raw type）就是擦除去了泛型信息，最后在字节码中的类型变量的真正类型
+
+```java
+import scala.reflect._
+def mkArray[T : ClassTag](ele: T*) = Array[T](ele: _*)
+```
 
 #### code练习
 - 如何使用reduceLeft得到数组中的最大元素?
@@ -208,10 +303,6 @@ def largest(fun: (Int) => Int, inputs: Seq[Int]): Int = {
 ```
 
 #### scala泛型
-- 类型边界限定分为上边界和下边界来对类进行限制
-
-> 上边界：泛型的类型必须是某种类型或者某种类型的**子类**，语法为`<:`
-下边界：泛型的类型必须是某种类型或者某种类型的**父类**，语法为`>:`
 
 
 - 使用`<%`可以对某种类型进行转换，多上下边界的补充，即为使用implicit进行隐式转换，语法为`<%`
