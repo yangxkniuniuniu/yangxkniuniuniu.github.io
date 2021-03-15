@@ -289,7 +289,7 @@ INSERT INTO company_db.event_test VALUES
     ('2020-01-01 12:10:00', 101, 'view'),
     ('2020-01-02 08:10:00', 100, 'view'),
     ('2020-01-03 13:00:00', 103, 'view');
--- 当前目录结构 
+-- 当前目录结构
 -- 【20200101_1_1_0  20200102_2_2_0  20200103_3_3_0  detached  format_version.txt】
 -- 查看20200101_1_1_0分区数据目录结构
 -- ├── checksums.txt
@@ -547,61 +547,61 @@ HAVING SUM(Sign) > 0
 使用此引擎，ck会将一个数据片段内具有相同排序件的行聚合成一行，这一行会存储一系列聚合函数的状态
 可用`AggregatingMergeTree`表来做增量数据的聚合统计，包括物化视图的数据聚合
 6.1 `ENGINE = AggregatingMergeTree()`
-不能够直接用Insert来写入数据，需要结合insert select. 
+不能够直接用Insert来写入数据，需要结合insert select.
 注意：不可以将新增的数据聚合起来
 ```sql
 -- 基础表
 create table tb_test_MergeTree_basic
 (
   brandId Int32,
-  shopId Int32, 
+  shopId Int32,
   saleDate Date,
   saleMoney Float32,
   saleQty Int32,
   vipId UInt64
-) 
-engine = MergeTree () 
-ORDER BY (brandId,shopId) 
-PARTITION BY (brandId,shopId) 
+)
+engine = MergeTree ()
+ORDER BY (brandId,shopId)
+PARTITION BY (brandId,shopId)
 -- 测试数据
 insert into tb_test_MergeTree_basic values (429,6001,'2020-10-01 14:15:23',200.50,10,10001),(429,6001,'2020-10-02 14:15:23',200.50,20,10002),(429,6001,'2020-10-03 14:15:23',200.50,30,10003),(429,6001,'2020-10-04 14:15:23',200.50,10,10001),(429,6001,'2020-10-05 14:15:23',200.50,20,10001),(429,6001,'2020-10-06 14:15:23',200.50,30,10003),(429,6002,'2020-10-04 14:15:23',200.50,40,10001),(429,6002,'2020-10-05 14:15:23',200.50,10,10001)
 -- 使用聚合树引擎表
 CREATE TABLE tb_test_AggregatingMergeTree_table
 (
-    `brandId` Int32, 
-    `shopId` Int32, 
-    `saleMoney` AggregateFunction(sum, Float32), 
-    `saleQty` AggregateFunction(sum, Int32), 
-    `saleNum` AggregateFunction(count, UInt8), 
+    `brandId` Int32,
+    `shopId` Int32,
+    `saleMoney` AggregateFunction(sum, Float32),
+    `saleQty` AggregateFunction(sum, Int32),
+    `saleNum` AggregateFunction(count, UInt8),
     `vipNum` AggregateFunction(uniq, UInt64)
 )
 ENGINE = AggregatingMergeTree()
 PARTITION BY (brandId, shopId)
 ORDER BY (brandId, shopId)
 -- 插入数据时需要结合聚合函数
-INSERT INTO tb_test_AggregatingMergeTree_table 
-SELECT 
-    brandId, 
-    shopId, 
-    sumState(saleMoney) AS saleMoney, 
-    sumState(saleQty) AS saleQty, 
-    countState(1) AS saleNum, 
+INSERT INTO tb_test_AggregatingMergeTree_table
+SELECT
+    brandId,
+    shopId,
+    sumState(saleMoney) AS saleMoney,
+    sumState(saleQty) AS saleQty,
+    countState(1) AS saleNum,
     uniqState(vipId) AS vipNum
 FROM tb_test_MergeTree_basic
-GROUP BY 
-    brandId, 
+GROUP BY
+    brandId,
     shopId
 -- 查询的时候也要加聚合函数
-SELECT 
-    brandId, 
-    shopId, 
-    sumMerge(saleMoney) AS saleMoney, 
-    sumMerge(saleQty) AS saleQty, 
-    countMerge(saleNum) AS saleNum, 
+SELECT
+    brandId,
+    shopId,
+    sumMerge(saleMoney) AS saleMoney,
+    sumMerge(saleQty) AS saleQty,
+    countMerge(saleNum) AS saleNum,
     uniqMerge(vipNum) AS vipNum
 FROM tb_test_AggregatingMergeTree_table
-GROUP BY 
-    brandId, 
+GROUP BY
+    brandId,
     shopId
 ```
 
@@ -611,16 +611,16 @@ CREATE MATERIALIZED VIEW tb_test_AggregatingMergeTree_view
 ENGINE = AggregatingMergeTree()
 PARTITION BY (brandId, shopId)
 ORDER BY (brandId, shopId) AS
-SELECT 
-    brandId, 
-    shopId, 
-    sumState(saleMoney) AS saleMoney, 
-    sumState(saleQty) AS saleQty, 
-    countState(1) AS saleNum, 
+SELECT
+    brandId,
+    shopId,
+    sumState(saleMoney) AS saleMoney,
+    sumState(saleQty) AS saleQty,
+    countState(1) AS saleNum,
     uniqState(vipId) AS vipNum
 FROM tb_test_MergeTree_basic
-GROUP BY 
-    brandId, 
+GROUP BY
+    brandId,
     shopId
 -- 创建物化视图前的数据已经不能再被跟踪
 -- 继续往基础表插入数据
@@ -632,14 +632,13 @@ insert into tb_test_MergeTree_basic values (429,6001,'2020-10-08 14:15:23',200.5
 -- ┌─brandId─┬─shopId─┬─saleMoney─┬─saleQty─┬─saleNum─┬─vipNum─┐
 -- │     429 │   6002 │ i@        │ (       │         │ $a6    │
 -- └─────────┴────────┴───────────┴─────────┴─────────┴────────┘
-select 
+select
   brandId,
   shopId,
   sumMerge(saleMoney) as saleMoney,
   sumMerge(saleQty) as saleQty,
   countMerge(saleNum) as saleNum,
-  uniqMerge(vipNum) as vipNum 
-from tb_test_AggregatingMergeTree_view 
+  uniqMerge(vipNum) as vipNum
+from tb_test_AggregatingMergeTree_view
 group by brandId,shopId
 ```
-
