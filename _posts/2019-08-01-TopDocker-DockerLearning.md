@@ -185,7 +185,8 @@ RUN buildDeps='gcc libc6-dev make' \
     ***一般推荐用exec格式***
 
 
-## docker搭建clickhouse集群
+## docker+clickhouse
+### 环境准备
 安装docker: `brew install --cask docker`
 #### 单机环境准备(macos)
 - clickhouse: `docker pull yandex/clickhouse-server`, `docker pull yandex/clickhouse-client`
@@ -231,7 +232,7 @@ RUN buildDeps='gcc libc6-dev make' \
 
 **后续学习均基于clickhouse集群进行**
 
-#### clickhouse接口
+### clickhouse接口
 1 客户端：进入容器后，执行`clickhouse-client`进入（在安装部署后，系统会默认安装）
 也可以选择不进入客户端：`cat file.csv | clickhouse-client --database=test --query="INSERT INTO test FORMAT CSV";`
 
@@ -242,8 +243,8 @@ RUN buildDeps='gcc libc6-dev make' \
 
 4 另外clickhouse还提供jdbc/odbc驱动
 
-#### clickhouse数据存储与索引机制
-##### 数据存储
+### clickhouse数据存储与索引机制
+#### 数据存储
 1. 数据片段datapart
 ck表是由**按主键排序的数据片段**组成，数据片段又可以以`Widw`和`Compact`两个格式存储。
 `Wide`: 每一列都会存储为单独的文件
@@ -391,7 +392,7 @@ WHERE uid = 101 and view = 'cancel'
 `Read 12 rows`：上面四个颗粒有12行数据，按照最后筛选，筛选出5行结果数据
 **结论**：所以通过分区+颗粒+索引的方式，对于数据量大的表来说，效率更高
 
-##### 索引
+#### 索引
 1. 什么时候使用索引：对于`SELECT`查询，下列场景ck会分析是否使用索引，`WHERE/PREWHERE`子句有如下表达式
 - 包含一个表示与主键/分区键中的部分字段或全部字段相等/不等的比较表达式
 - 基于主键/分区键的字段上的`IN`或固定前缀的`LIKE`表达式
@@ -409,8 +410,8 @@ WHERE uid = 101 and view = 'cancel'
 - `set(max_rows)`：存储指定表达式的不重复值(不超过`max_rows`个，`max_rows=0`表示无限制)
 
 
-#### 表引擎
-建表语法：
+### 表引擎
+#### 建表语法
 ```sql
 CREATE TABLE [IF NOT EXISTS] [db.]table_name [ON CLUSTER cluster]
 (
@@ -445,7 +446,7 @@ ORDER BY expr
   - `storage_policy` -- 存储策略
   - `min_bytes_for_wide_part`,`min_rows_for_wide_part` -- 在数据片段中可以使用Wide格式进行存储的最小字节数/行数。你可以不设置、只设置一个，或全都设置
 
-##### 列TTL和表TTL：
+#### 列TTL和表TTL
 - 列TTL：当列中的值过期时，ck会先将他们替换成该列数据类型的默认值，在数据片段中列的所有值均已过期，则会从文件系统中的数据片段删除此列
 ```sql
 -- 创建表时指定 TTL
@@ -491,7 +492,7 @@ ALTER TABLE example_table MODIFY TTL d + INTERVAL 1 DAY;
 - 数据删除：当ck发现数据过期时，将会执行一个计划外的Merge。要控制这类合并的频率, 你可以设置`merge_with_ttl_timeout`。如果该值被设置的太低, 它将引发大量计划外的合并，这可能会消耗大量资源。
 
 
-**MergeTree家族**
+#### MergeTree家族
 1. MergeTree
 `ENGINE = MergeTree()`
 同一批次插入的数据会重新按照partition by规则写入新的分区，不会关心之前批次生成的分区。在ck内部会不定时的进行分区merge(大约是插入后15min左右),merge的过程是生成一个新的分区，然后把历史分区标记成(active=0)的状态，过段时间会把active=0的分区删除，再过段时间会删除相应的元数据
