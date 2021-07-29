@@ -201,7 +201,6 @@ public int selectChannel(SerializationDelegate<StreamRecord<T>> record) {
 ```
 
 - `RescalePartitioner`: 从`selectChannel`层面来看和rebalance没有太大的区别，但是StreamGraph -> JobGraph的过程中，会对`RescalePartitioner`和`ForwardPartitioner`进行特殊处理。`POINTWISE`模式下在中间结果下发给下游节点时，会根据并行度的比值来轮询分配给下游算子实例的子集，对TaskMananger来说本地性会比较好，而在`ALL_TO_ALL`模式下是真正意义上的全局轮询分配，这样节点间的数据交换更加频繁。
-
 ```java
 private int nextChannelToSendTo = -1;
 @Override
