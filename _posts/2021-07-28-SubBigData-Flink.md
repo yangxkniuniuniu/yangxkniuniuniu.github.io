@@ -20,14 +20,14 @@ tags:
 ## 架构详解
 
 ## Flink窗口计算
-### window生命周期
+#### window生命周期
 一般来说，每一个窗口会有一个`Trigger`和一个`Function`。`Function`决定了窗口里面的数据会被如何进行计算处理，而`Trigger`指定了何时出发窗口计算的条件。触发器同时也可以清除任何在窗口创建后和移除前时间段内的数据，这个地方需要注意，触发器仅会清除窗口内的元素，而不会清除窗口的元数据信息，因此，新的数据仍然可以加入到窗口中。
 除此之类，还可以指定`Evictor`用于在窗口被触发后、窗口计算前，进行数据的筛选移除操作，类似于`filter`操作。
 
-### Keyed and Non-Keyed Windows
+#### Keyed and Non-Keyed Windows
 在定义window前必须要做的操作：指定是`keyedStream`还是`nonKeyedStream`，一般使用`keyBy()`算子来区分。使用`keyedStream`可以将任务以多并行度进行运行，每个逻辑`keyedStream`都可以独立于其余部分进行计算，有相同键值的元素会被发送到同一个并行任务上运行。而`nonKeyedStream`对应的窗口计算会在同一个任务里面进行，即并行度为1
 
-### Window Assigners
+#### Window Assigners
 window assigner决定了数据被如何分配到相应的窗口中，在`window()`或`windowAll()`中指定相应的`WindowAssigner`。Flink提供了绝大多数场景使用的几个Assigner。
 - `Tumbing Windows`：滚动窗口
 ![滚动窗口](https://tva1.sinaimg.cn/large/008i3skNgy1gsxvy4pwa2j30lm0csaax.jpg)
@@ -80,7 +80,7 @@ input
     .<windowed transformation>(<window function>)
 ```
 
-### Window Function
+#### Window Function
 WindowFunction一般有三种：`ReduceFunction`、 `AggregateFunction`、 `ProcessWindowFunction`。前两种执行效率会更高，因为Flink会进行增量的计算，而`ProcessWindowFunction`会得到窗口里的所有元素以及窗口的元数据信息。
 
 - `ReduceFunction`
@@ -112,7 +112,7 @@ class MyProcessWindowFunction extends ProcessWindowFunction[(String, Long), Stri
 }
 ```
 
-### Triggers
+#### Triggers
 Triggers决定窗口何时进行计算，每一个WindowAssigner都有一个默认的Trigger，当默认的Trigger不满足需求的时候，可以使用自定义Trigger。Tirgger提供以下5个方法来处理不同的事件：
 - `onElement()` : 每一个元素被加入到窗户时调用
 - `onEventTime()` : 基于事件时间，当定时器被触发时调用
@@ -122,7 +122,7 @@ Triggers决定窗口何时进行计算，每一个WindowAssigner都有一个默�
 
 ## Flink算子
 
-### Flink物理分区
+#### Flink物理分区
 - `GlobalPartitioner`: 将数据输出到下游算子的第一个实例
 
 - `ShufflePartitioner`: 将数据随机输出到下游算子的并发实例
@@ -190,6 +190,7 @@ public static int computeOperatorIndexForKeyGroup(int maxParallelism, int parall
 ```
 
 - `BroadcastPartitioner`: broadcast专用分区器，由于broadcast发挥作用必须靠`DataStream.connect()`与正常的数据流连接，广播数据总会投递给下游算子的所有并发，因此`selectChannel`就不必实现了
+
 ```java
 /**
  * Note: Broadcast mode could be handled directly for all the output channels
@@ -201,8 +202,7 @@ public int selectChannel(SerializationDelegate<StreamRecord<T>> record) {
 }
 ```
 
-- `RescalePartitioner`: 从`selectChannel`层面来看和rebalance没有太大的区别，但是StreamGraph -> JobGraph的过程中，会对`RescalePartitioner`和`ForwardPartitioner`进行特殊处理。
->`POINTWISE`模式下在中间结果下发给下游节点时，会根据并行度的比值来轮询分配给下游算子实例的子集，对TaskMananger来说本地性会比较好，而在`ALL_TO_ALL`模式下是真正意义上的全局轮询分配，这样节点间的数据交换更加频繁。
+- `RescalePartitioner`: 从`selectChannel`层面来看和rebalance没有太大的区别，但是StreamGraph -> JobGraph的过程中，会对`RescalePartitioner`和`ForwardPartitioner`进行特殊处理。`POINTWISE`模式下在中间结果下发给下游节点时，会根据并行度的比值来轮询分配给下游算子实例的子集，对TaskMananger来说本地性会比较好，而在`ALL_TO_ALL`模式下是真正意义上的全局轮询分配，这样节点间的数据交换更加频繁。
 
 ```java
 private int nextChannelToSendTo = -1;
