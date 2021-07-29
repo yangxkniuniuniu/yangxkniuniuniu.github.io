@@ -50,7 +50,6 @@ window assigner决定了数据被如何分配到相应的窗口中，在`window(
 - `Session Windows`: 回话窗口
 Session窗口中，数据不会重复落入多个窗口中，且窗口的大小不固定。相反，在一段时间内没有收到数据后，窗口会被关闭
 ![Session窗口](https://tva1.sinaimg.cn/large/008i3skNgy1gsxvzs4s7nj30lh0cnq3t.jpg)
-
 ```java
 val input: DataStream[T] = ...
 // event-time session windows with static gap
@@ -72,7 +71,6 @@ input
 - `Global Windows`: 全局窗口
 全局窗口将所有的数据都分配给一个窗口，这个窗口仅在自定义`Trigger`的时候才有用，否则不会执行任何窗口计算。
 ![全局窗口](https://tva1.sinaimg.cn/large/008i3skNgy1gsxwbppn1lj30lm0c2gm1.jpg)
-
 ```java
 input
     .keyBy(<key selector>)
