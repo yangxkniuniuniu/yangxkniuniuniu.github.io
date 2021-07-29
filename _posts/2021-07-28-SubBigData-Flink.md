@@ -188,7 +188,6 @@ public static int computeOperatorIndexForKeyGroup(int maxParallelism, int parall
 ```
 
 - `BroadcastPartitioner`: broadcast专用分区器，由于broadcast发挥作用必须靠`DataStream.connect()`与正常的数据流连接，广播数据总会投递给下游算子的所有并发，因此`selectChannel`就不必实现了
-
 ```java
 /**
  * Note: Broadcast mode could be handled directly for all the output channels
