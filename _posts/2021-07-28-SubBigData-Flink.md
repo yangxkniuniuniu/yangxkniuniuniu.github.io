@@ -50,15 +50,14 @@ window assigner决定了数据被如何分配到相应的窗口中，在`window(
 - `Session Windows`: 回话窗口
 Session窗口中，数据不会重复落入多个窗口中，且窗口的大小不固定。相反，在一段时间内没有收到数据后，窗口会被关闭
 ![Session窗口](https://tva1.sinaimg.cn/large/008i3skNgy1gsxvzs4s7nj30lh0cnq3t.jpg)
+
 ```java
 val input: DataStream[T] = ...
-
 // event-time session windows with static gap
 input
     .keyBy(<key selector>)
     .window(EventTimeSessionWindows.withGap(Time.minutes(10)))
     .<windowed transformation>(<window function>)
-
 // event-time session windows with dynamic gap
 input
     .keyBy(<key selector>)
@@ -73,6 +72,7 @@ input
 - `Global Windows`: 全局窗口
 全局窗口将所有的数据都分配给一个窗口，这个窗口仅在自定义`Trigger`的时候才有用，否则不会执行任何窗口计算。
 ![全局窗口](https://tva1.sinaimg.cn/large/008i3skNgy1gsxwbppn1lj30lm0c2gm1.jpg)
+
 ```java
 input
     .keyBy(<key selector>)
@@ -95,11 +95,8 @@ input
 ```java
 class AverageAgg extends AggregateFunction[(String, Long), (Long, Long), Double] {
   override def createAccumulator(): (Long, Long) = (0L, 0L)
-
   override def add(value: (String, Long), accumulator: (Long, Long)): (Long, Long) = (accumulator._1 + value._2, accumulator._1 + 1L)
-
   override def getResult(accumulator: (Long, Long)): Double = accumulator._1 / accumulator._2
-
   override def merge(a: (Long, Long), b: (Long, Long)): (Long, Long) = (a._1 + b._1, a._2 + b._2)
 }
 ```
@@ -141,7 +138,6 @@ private int nextChannelToSendTo;
 @Override
 public void setup(int numberOfChannels) {
     super.setup(numberOfChannels);
-
     nextChannelToSendTo = ThreadLocalRandom.current().nextInt(numberOfChannels);
 }
 // stream.rebalance()
@@ -156,19 +152,15 @@ public int selectChannel(SerializationDelegate<StreamRecord<T>> record) {
 - `KeyGroupStreamPartitioner`: `keyBy()`算子的底层采用的分区方式
 ```java
 private final KeySelector<T, K> keySelector;
-
 private int maxParallelism;
-
 public KeyGroupStreamPartitioner(KeySelector<T, K> keySelector, int maxParallelism) {
     Preconditions.checkArgument(maxParallelism > 0, "Number of key-groups must be > 0!");
     this.keySelector = Preconditions.checkNotNull(keySelector);
     this.maxParallelism = maxParallelism;
 }
-
 public int getMaxParallelism() {
     return maxParallelism;
 }
-
 @Override
 public int selectChannel(SerializationDelegate<StreamRecord<T>> record) {
     K key;
@@ -214,7 +206,6 @@ public int selectChannel(SerializationDelegate<StreamRecord<T>> record) {
 
 ```java
 private int nextChannelToSendTo = -1;
-
 @Override
 public int selectChannel(SerializationDelegate<StreamRecord<T>> record) {
     if (++nextChannelToSendTo >= numberOfChannels) {
