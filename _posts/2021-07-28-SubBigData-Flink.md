@@ -13,7 +13,7 @@ tags:
 ---
 
 > - Create Date: 2021-07-28
-> - Update Date: 2021-07-28
+> - Update Date: 2021-08-24
 
 > **[上层URL: 大数据学习笔记](http://owlcity.top/2019/12/01/TopBigData-BigdataLearning/)**
 
@@ -136,8 +136,11 @@ Tirgger需要实现以下5个方法：
 - `PRUGE`: 窗口内部数据清除且不触发计算
 - `FIRE_AND_PURGE`: 触发计算并清除对应的数据
 
-## Joining
-#### Window Join
+
+## Flink算子
+
+#### Joining
+**Window Join**
 sample:
 ```java
 stream1.join(stream2)
@@ -155,7 +158,7 @@ stream1.join(stream2)
 - Session Window Join
 ![Session](https://tva1.sinaimg.cn/large/008i3skNgy1gtr1eagosoj60zo0as74o02.jpg)
 
-#### Interval Join
+**Interval Join**
 ![Interval join](https://tva1.sinaimg.cn/large/008i3skNgy1gtr1bb8h4qj60z60am0t702.jpg)
 
 ```java
@@ -167,8 +170,6 @@ stream1
     .between(Time.seconds(-2), Time.seconds(1))
     .process(ProcessJoinFunction())
 ```
-
-## Flink算子
 
 #### Flink物理分区
 - `GlobalPartitioner`: 将数据输出到下游算子的第一个实例
