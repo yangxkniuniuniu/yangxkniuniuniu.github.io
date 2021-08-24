@@ -111,12 +111,62 @@ class MyProcessWindowFunction extends ProcessWindowFunction[(String, Long), Stri
 ```
 
 #### Triggers
-Triggers决定窗口何时进行计算，每一个WindowAssigner都有一个默认的Trigger，当默认的Trigger不满足需求的时候，可以使用自定义Trigger。Tirgger提供以下5个方法来处理不同的事件：
+Triggers决定窗口何时进行计算，每一个WindowAssigner都有一个默认的Trigger，当默认的Trigger不满足需求的时候，可以使用自定义Trigger。
+Flink提供的Triggers:
+- `EventTimeTrigger`：event-time window assigner默认使用的触发器
+- `ProcessTimeTrigger`：processing-time window assigner默认使用的触发器
+- `NeverTrigger`: `GlobalWindow`默认的触发器
+- `ContinuousEventTimeTrigger`: 根据间隔时间周期性触发窗口或Window的结束时间小于当前EndTime触发窗口计算
+- `ContinuousProcessingTimeTrigger`: ...
+- `CountTrigger`: 根据接入的数据量是否超过设定的阈值判断是否进行窗口计算
+- `DeltaTrigger`:  根据接入数据计算出来的Delta指标是否超过指定的Threshold去判断是否触发窗口计算
+- `PurgingTrigger`: 可以将任意触发器作为参数转换为Purge类型的触发器，计算完成后数据将被清理
+
+
+Tirgger需要实现以下5个方法：
 - `onElement()` : 每一个元素被加入到窗户时调用
 - `onEventTime()` : 基于事件时间，当定时器被触发时调用
 - `onProcessingTime()` : 基于处理时间，当定时器被触发时调用
-- `onMerge()` :
-- `clear()`
+- `onMerge()` : 在两个触发器的状态窗口合并的时候执行，比如session window
+- `clear()` : 执行窗口及状态数据的清除
+
+窗口触发返回结果的类型：
+- `CONTINUE`: 不进行操作，等待
+- `FIRE`: 触发计算且数据保留
+- `PRUGE`: 窗口内部数据清除且不触发计算
+- `FIRE_AND_PURGE`: 触发计算并清除对应的数据
+
+## Joining
+#### Window Join
+sample:
+```java
+stream1.join(stream2)
+    .where(_._1)
+    .equalTo(_._1)
+    .window(TumblingEventTimeWindows.of(Time.Seconds(5)))
+    .apply(<JoinFunction>)
+```
+- Tumbling Window Join
+![Tumbling](https://tva1.sinaimg.cn/large/008i3skNgy1gtr1cqsoqgj60u60asdg702.jpg)
+
+- Sliding Window Join
+![Sliding](https://tva1.sinaimg.cn/large/008i3skNgy1gtr1dowrdnj60uk0bidga02.jpg)
+
+- Session Window Join
+![Session](https://tva1.sinaimg.cn/large/008i3skNgy1gtr1eagosoj60zo0as74o02.jpg)
+
+#### Interval Join
+![Interval join](https://tva1.sinaimg.cn/large/008i3skNgy1gtr1bb8h4qj60z60am0t702.jpg)
+
+```java
+val stream1 = ...
+val stream2 = ...
+stream1
+    .keyBy(_._1)
+    .intervalJoin(stream2.keyBy(_._1))
+    .between(Time.seconds(-2), Time.seconds(1))
+    .process(ProcessJoinFunction())
+```
 
 ## Flink算子
 
@@ -234,3 +284,75 @@ dtaSource.partitionCustom(new Partitioner[String] {
   override def partition(key: String, numPartitions: Int): Int = key.length % numPartitions
 }, _._1)
 ```
+
+## Process Function
+#### 介绍
+ProcessFunction 函数是低阶流处理算子，可以访问流应用程序所有（非循环）基本构建块：
+- 事件 (数据流元素)
+ProcessFunction 可以被认为是一种提供了对 KeyedState 和定时器访问的 FlatMapFunction。每在输入流中接收到一个事件，就会调用来此函数来处理。
+
+- 状态 (容错和一致性)
+对于容错的状态，ProcessFunction 可以通过 RuntimeContext 访问 KeyedState，类似于其他有状态函数访问 KeyedState。
+
+- 定时器 (事件时间和处理时间)
+定时器可以对处理时间和事件时间的变化做一些处理。每次调用 `processElement()` 都可以获得一个 Context 对象，通过该对象可以访问元素的事件时间戳以及 `TimerService`. `TimerService` 可以为尚未发生的事件时间/处理时间实例注册回调。当定时器到达某个时刻时，会调用 `onTimer()` 方法。在调用期间，所有状态再次限定为定时器创建的键，允许定时器操作 KeyedState。
+
+```java
+stream.keyBy(...).process(new MyProcessFunction)
+```
+
+#### 低阶Join
+要在两个输入上实现低阶操作，应用程序可以使用 CoProcessFunction。这个函数绑定了两个不同的输入，并为来自两个不同输入的记录分别调用 `processElement1()` 和 `processElement2()`。
+实现低阶 Join 通常遵循以下模式：
+- 为一个输入（或两个）创建状态对象。
+- 在从输入中收到元素时更新状态。
+- 在从其他输入收到元素时扫描状态对象并生成 Join 结果。
+
+例如，你可能会将客户数据与金融交易数据进行 Join，并将客户数据存储在状态中。如果你比较关心无序事件 Join 的完整性和确定性，那么当客户数据流的 Watermark 已经超过交易时间时，你可以使用定时器来计算和发出交易的 Join。
+
+#### 实例
+在以下示例中，KeyedProcessFunction 为每个键维护一个计数，并且会把一分钟(事件时间)内没有更新的键/值对输出：
+
+- 计数，键以及最后更新的时间戳会存储在 ValueState 中，ValueState 由 key 隐含定义。
+- 对于每条记录，KeyedProcessFunction 增加计数器并修改最后的时间戳。
+- 该函数还会在一分钟后调用回调（事件时间）。
+- 每次调用回调时，都会检查存储计数的最后修改时间与回调的事件时间时间戳，如果匹配则发送键/计数键值对（即在一分钟内没有更新）
+
+```java
+val dtaSource= env.socketTextStream("localhost", 9999)
+    .flatMap(x => x.split("\\s"))
+    .map((_, 1))
+    .keyBy(_._1)
+    .process(new CustomFunc())
+// case class
+case class CountWithT(key: String, count: Long, lastModify: Long)
+/** keyed process function
+* @param <K> Type of the key.
+* @param <I> Type of the input elements.
+* @param <O> Type of the output elements.
+**/
+class CustomFunc extends KeyedProcessFunction[String, (String, Int), (String, Long)] {
+    lazy val state: ValueState[CountWithT] = getRuntimeContext.getState(new ValueStateDescriptor[CountWithT]("mystate", classOf[CountWithT]))
+    // 每来一条数据会处理一次且会设置一个60s的Timer
+    override def processElement(value: (String, Int), ctx: KeyedProcessFunction[String, (String, Int), (String, Long)]#Context, out: Collector[(String, Long)]): Unit = {
+      val current = state.value() match {
+        case null => CountWithT(value._1, 1, ctx.timestamp())
+        case CountWithT(key, count, lastModify) => CountWithT(key, count + 1, ctx.timestamp())
+      }
+      state.update(current)
+      ctx.timerService().registerEventTimeTimer(current.lastModify + 60000)
+    }
+    // 60s后会进行回调, 如果一分钟内没有更新，那键值对会被发送出去
+    override def onTimer(timestamp: Long, ctx: KeyedProcessFunction[String, (String, Int), (String, Long)]#OnTimerContext, out: Collector[(String, Long)]): Unit = {
+      state.value() match {
+        case CountWithT(key, count, lastModify) if (timestamp == lastModify + 60000) => out.collect((key, count))
+        case _ =>
+      }
+    }
+}
+```
+
+#### 定时器
+TimerService 在内部维护两种类型的定时器（处理时间和事件时间定时器）并排队执行。
+TimerService 会删除每个键和时间戳重复的定时器，即每个键在每个时间戳上最多有一个定时器。如果为同一时间戳注册了多个定时器，则只会调用一次 `onTimer()` 方法。
+>Flink同步调用 onTimer() 和 processElement() 方法。因此，用户不必担心状态的并发修改。

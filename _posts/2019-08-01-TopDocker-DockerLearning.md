@@ -643,3 +643,42 @@ select
 from tb_test_AggregatingMergeTree_view
 group by brandId,shopId
 ```
+
+## 常用命令
+- 查看表占磁盘空间大小
+```sql
+select
+    database,
+    table,
+    formatReadableSize(size) as size,
+    formatReadableSize(bytes_on_disk) as bytes_on_disk,
+    formatReadableSize(data_uncompressed_bytes) as data_uncompressed_bytes,
+    formatReadableSize(data_compressed_bytes) as data_compressed_bytes,
+    compress_rate,
+    rows,
+    days,
+    formatReadableSize(avgDaySize) as avgDaySize
+from
+(
+    select
+        database,
+        table,
+        sum(bytes) as size,
+        sum(rows) as rows,
+        min(min_date) as min_date,
+        max(max_date) as max_date,
+        sum(bytes_on_disk) as bytes_on_disk,
+        sum(data_uncompressed_bytes) as data_uncompressed_bytes,
+        sum(data_compressed_bytes) as data_compressed_bytes,
+        (data_compressed_bytes / data_uncompressed_bytes) * 100 as compress_rate,
+        max_date - min_date as days,
+        size / (max_date - min_date) as avgDaySize
+    from system.parts
+    where active
+    and database <> 'system'
+    group by
+        database,
+        table
+    order by bytes_on_disk desc
+);
+```
