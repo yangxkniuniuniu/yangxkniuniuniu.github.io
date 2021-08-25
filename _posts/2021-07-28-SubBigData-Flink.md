@@ -1,7 +1,7 @@
 ---
 layout:     post
 title:      Flink
-subtitle:   Flink
+subtitle:   Flink-DataStream API
 date:       2021-07-28
 author:     owl city
 header-img: img/post-bg-lamplight.jpg
@@ -357,3 +357,81 @@ class CustomFunc extends KeyedProcessFunction[String, (String, Int), (String, Lo
 TimerService 在内部维护两种类型的定时器（处理时间和事件时间定时器）并排队执行。
 TimerService 会删除每个键和时间戳重复的定时器，即每个键在每个时间戳上最多有一个定时器。如果为同一时间戳注册了多个定时器，则只会调用一次 `onTimer()` 方法。
 >Flink同步调用 onTimer() 和 processElement() 方法。因此，用户不必担心状态的并发修改。
+
+**容错**：定时器具有容错能力，并且与应用程序的状态一起进行快照。如果故障恢复或从保存点启动应用程序，就会恢复定时器。
+
+**定时器合并**：由于 Flink 仅为每个键和时间戳维护一个定时器，因此可以通过降低定时器的频率来进行合并以减少定时器的数量。对于频率为1秒的定时器（事件时间或处理时间），我们可以将目标时间向下舍入为整秒数。定时器最多提前1秒触发，但不会迟于我们的要求，精确到毫秒。因此，每个键每秒最多有一个定时器。
+```java
+val coalescedTime = ((ctx.timestamp + timeout) / 1000) * 1000
+ctx.timerService().registerEventTimeTimer(coalescedTime)
+```
+
+**定时器删除**： 如果没有给当前Key指定时间戳注册定时器，那么停止定时器没有任何效果
+```java
+val timestampOfTimerToStop = ...
+ctx.timerService.deleteEventTimeTimer(timestampOfTimerToStop)
+```
+
+## 用户自定义Functions&累加器、计数器
+#### 累加器
+注意事项：
+- 首先，在需要使用累加器的用户自定义的转换 function 中创建一个累加器对象（此处是计数器）。
+- 其次，必须在 rich function 的 `open()` 方法中注册累加器对象。也可以在此处定义名称。
+- 然后，在操作 function 中的任何位置（包括 `open()` 和 `close()` 方法中）使用累加器。
+- 最后，整体结果会存储在由执行环境的 execute() 方法返回的 JobExecutionResult 对象中（当前只有等待作业完成后执行才起作用）。
+
+>单个作业的所有累加器共享一个命名空间。因此你可以在不同的操作 function 里面使用同一个累加器。Flink 会在内部将所有具有相同名称的累加器合并起来。
+
+```java
+val env = StreamExecutionEnvironment.getExecutionEnvironment
+val dtaSource= env.socketTextStream("localhost", 9999)
+  .flatMap(x => x.split("\\s"))
+  .map((_, 1))
+  .keyBy(_._1)
+  .process(new CustomFunc())
+val jobExecutionResult: JobExecutionResult = env.execute("Join Example")
+jobExecutionResult.getAccumulatorResult("number-lines")
+// 用户自定义Function并注册累加器对象
+class cusMapFunc extends RichMapFunction[String, String] {
+  private val numLines = new IntCounter()
+  // 在rich function的open方法中注册累加器
+  override def open(parameters: Configuration): Unit = {
+    getRuntimeContext.addAccumulator("number-lines", this.numLines)
+    super.open(parameters)
+  }
+  override def map(value: String): String = {
+    this.numLines.add(1)
+    value.substring(2)
+  }
+}
+```
+
+## 旁路输出
+使用旁路输出时，首先需要定义用于标识旁路输出流的 OutputTag：
+`val outputTag = OutputTag[String]("side-output")`
+可以通过以下方法将数据发送到旁路输出：
+- ProcessFunction
+- KeyedProcessFunction
+- CoProcessFunction
+- KeyedCoProcessFunction
+- ProcessWindowFunction
+- ProcessAllWindowFunction
+
+```java
+val input: DataStream[Int] = ...
+val outputTag = OutputTag[String]("side-output")
+val mainDataStream = input
+  .process(new ProcessFunction[Int, Int] {
+    override def processElement(
+        value: Int,
+        ctx: ProcessFunction[Int, Int]#Context,
+        out: Collector[Int]): Unit = {
+      // 发送数据到主要的输出
+      out.collect(value)
+      // 发送数据到旁路输出
+      ctx.output(outputTag, "sideout-" + String.valueOf(value))
+    }
+  })
+// 获取旁路输出
+val sideOutputStream: DataStream[String] = mainDataStream.getSideOutput(outputTag)
+```
