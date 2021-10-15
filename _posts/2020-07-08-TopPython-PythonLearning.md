@@ -96,22 +96,22 @@ myStr.translate(table)
 ```
 
 ## 字典
-- 可以使用dict()函数从其他映射或者键值对创建字典。
-- clear()  清空字典
-- copy() 返回一个新的字典
+- 可以使用`dict()`函数从其他映射或者键值对创建字典。
+- `clear()`  清空字典
+- `copy()` 返回一个新的字典
 当替换副本中的值，原件不会受到影响，但是如果修改副本中的值，原件也会发生变化。
-为避免这种同时复制值以及其包含的所有值。使用模块copy中的函数deepcopy()
-- fromkeys() 创建一个只有key的字典
+为避免这种同时复制值以及其包含的所有值。使用模块copy中的函数`deepcopy()`
+- `fromkeys()` 创建一个只有key的字典
 ```python
 {}.fromkeys(['name','age'])
 {'age':None,'name':None}
 ```
-- get()
-- item() 返回一个包含所有字典项的**列表**，每个元素都是KV对的形式。返回值为一种名为视图字典的特殊类型（可用于迭代）
-- keys() 返回一个字典视图，其中包含指定字典中的健
-- values 返回一个字典中的值组成的字典视图
-- pop() 删除指定键值对
-- popitem() 随机删除一个键值对
+- `get()`
+- `item()` 返回一个包含所有字典项的**列表**，每个元素都是KV对的形式。返回值为一种名为视图字典的特殊类型（可用于迭代）
+- `keys()` 返回一个字典视图，其中包含指定字典中的健
+- `values()` 返回一个字典中的值组成的字典视图
+- `pop()` 删除指定键值对
+- `popitem()` 随机删除一个键值对
 
 ## 语法
 - 三目表达式：s
@@ -119,8 +119,8 @@ myStr.translate(table)
 - `elif`语句与java中的`else if`一样
 - while 循环
 - for 循环 `for xx in xxx: ...`
-- range(）创建范围的内置函数 `range(start, end, [duration])`
-- zip() 并行迭代
+- `range(`创建范围的内置函数 `range(start, end, [duration])`
+- `zip()` 并行迭代
 ```python
 names = ['codi', 'mray', 'kkk']
 ages = [18, 31, 55]
@@ -133,7 +133,7 @@ for names, ages in zip(names, ages):
 # mray is 31 years old
 # kkk is 55 years old
 ```
-- enumerate() 能够迭代索引-值对，其中索引是自动提供的
+- `enumerate()` 能够迭代索引-值对，其中索引是自动提供的
 - break 跳出循环
 - continue 结束当前迭代，并调到下一次迭代开头
 - 列表推导
@@ -176,7 +176,6 @@ class Filter:
         self.blocked = []
     def filter(self,sequence):
         return ...
-
 class SPAMFilter(Filter):
     def init(self):
         self.blocked = ['SPAM']
