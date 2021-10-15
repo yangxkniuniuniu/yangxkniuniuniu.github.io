@@ -435,3 +435,98 @@ val mainDataStream = input
 // 获取旁路输出
 val sideOutputStream: DataStream[String] = mainDataStream.getSideOutput(outputTag)
 ```
+
+## 状态与容错
+#### State
+[Flink状态与容错](https://awslzhang.top/2021/01/02/Flink%E7%8A%B6%E6%80%81%E7%AE%A1%E7%90%86/)
+
+#### Keyed State
+**状态有效期TTL**
+任何类型的 keyed state 都可以有 有效期 (TTL)。如果配置了 TTL 且状态值已过期，则会尽最大可能清除对应的值
+```java
+val ttlConfig = StateTtlConfig
+    .newBuilder(Time.seconds(1))
+    .setUpdateType(StateTtlConfig.UpdateType.OnCreateAndWrite)
+    .setStateVisibility(StateTtlConfig.StateVisibility.NeverReturnExpired)
+    .build
+val stateDescriptor = new ValueStateDescriptor[String]("text state", classOf[String])
+stateDescriptor.enableTimeToLive(ttlConfig)
+```
+
+TTL配置有几个选项：
+-  `newBuilder` 表示数据的有效期，必选项
+-  TTL更新策略：
+    - `StateTtlConfig.UpdateType.OnCreateAndWrite`: 仅在创建和写入时更新(默认)
+    - `StateTtlConfig.UpdateType.OnReadAndWrite`: 读取写入时更新
+- 数据在过期但未被清理时的可见性配置:
+    - `StateTtlConfig.StateVisibility.NeverReturnExpired`: 不返回过期数据(默认)
+    - `StateTtlConfig.StateVisibility.ReturnExpireIfNotCleanedUp`: 会返回过期但未清理的数据
+
+> - 状态的修改时间会和数据一起保存在state backend中，因此开启此特性会增加状态数据的存储
+> - 暂只支持`processing time`的TTL
+> - 尝试从 checkpoint/savepoint 进行恢复时，TTL 的状态（是否开启）必须和之前保持一致，否则会遇到 `StateMigrationException`
+> - TTL 的配置并不会保存在 checkpoint/savepoint 中，仅对当前 Job 有效
+> - 当前开启 TTL 的 map state 仅在用户值序列化器支持 null 的情况下，才支持用户值为 null。如果用户值序列化器不支持 null， 可以用 `NullableSerializer` 包装一层
+> - State TTL 当前在 PyFlink DataStream API 中还不支持
+
+#### Operator State
+**示例: 自定义sinkFunction,在chekpointedFunction中进行数据缓存，然后统一下发到下游**
+```java
+class BufferingSink(threshold: Int = 0) extends SinkFunction[(String, Int)] with CheckpointedFunction {
+  private var checkpointState: ListState[(String, Int)] = _
+  private val bufferedElements = ListBuffer[(String, Int)]()
+  override def invoke(value: (String, Int), context: SinkFunction.Context): Unit = {
+    bufferedElements += value
+    if (bufferedElements.size == threshold) {
+      for (ele <- bufferedElements) {
+        // send to sink
+      }
+  }
+    bufferedElements.clear()
+  }
+  // 进行checkpoint时会调用
+  override def snapshotState(context: FunctionSnapshotContext): Unit = {
+    checkpointState.clear()
+    for (ele <- bufferedElements) {
+      checkpointState.add(ele)
+    }
+  }
+  // 初始化宝库第一次自定义函数初始化和从之前的checkpoint恢复
+  override def initializeState(context: FunctionInitializationContext): Unit = {
+    val descriptor = new ListStateDescriptor[(String, Int)]("bufferedEleStatee", TypeInformation.of(new TypeHint[(String, Int)] {}))
+    checkpointState = context.getOperatorStateStore.getListState(descriptor)
+    if (context.isRestored) {
+      val itero = checkpointState.get().iterator()
+      while (itero.hasNext) {
+        bufferedElements += itero.next()
+      }
+    }
+  }
+}
+```
+
+#### Broadcast State
+
+#### checkpointing
+Flink 中的每个方法或算子都能够是有状态的。 状态化的方法在处理单个 元素/事件 的时候存储数据，让状态成为使各个类型的算子更加精细的重要部分。 为了让状态容错，Flink 需要为状态添加 checkpoint（检查点）。Checkpoint 使得 Flink 能够恢复状态和在流中的位置，从而向应用提供和无故障执行时一样的语义。
+
+```java
+val env = StreamExecutionEnvironment.getExecutionEnvironment
+// 每1000ms开始一次checkpoint
+env.enableCheckpointing(1000)
+// 设置模式为精确一次
+env.getCheckpointConfig.setCheckpointingMode(CheckpointingMode.EXACTLY_ONCE)
+// 确认checkpoints之间的时间会进行500ms
+env.getCheckpointConfig.setMinPauseBetweenCheckpoints(500)
+// checkpoint必须在一分钟之内完成，否则会被抛弃
+env.getCheckpointConfig.setCheckpointTimeout(1000)
+// 如果task的checkpoint发生错误，会租车task失败，checkpoint仅仅会被抛弃并将错误信息回到给checkpoint coordinator
+env.getCheckpointConfig.setFailOnCheckpointingErrors(false)
+// 同一时间只允许一个checkpoint进行
+env.getCheckpointConfig.setMaxConcurrentCheckpoints(1)
+```
+
+**State Backend**
+默认情况下，状态始终保存在TaskManagers的内存中，checkpoint保存JobManager的内存中，为了合适的持久化大体量状态，可以将checkpoint状态存储到其他state backends上。`StreamExecutionEnvironment.setStateBackend()`来配置
+
+## Table API & SQL
