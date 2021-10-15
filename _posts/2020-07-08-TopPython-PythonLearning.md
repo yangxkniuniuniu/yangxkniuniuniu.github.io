@@ -24,28 +24,27 @@ tags:
 直接使用 # 进行注释
 
 - str和repr
-```
+```python
 print(repr("Hello,\nworld!"))
 # Hello,\nworld!
-
 print(str("Hello,\nworld"))
 # Hello,
 # world！
 ```
-- 删除List中的元素
-`del arrs[2]`
-- append:List末尾添加一个数据
-`arrs.append(9)`
-- insert将一个对象插入列表
-`arrs.insert(3,'hello')`
-- pop:从列表中删除一个元素，并返回这一元素
-`arrs.pop(1)  `
+- 删除List中的元素:`del arrs[2]`
+
+- append:List末尾添加一个数据:`arrs.append(9)`
+
+- insert将一个对象插入列表:`arrs.insert(3,'hello')`
+
+- pop:从列表中删除一个元素，并返回这一元素: `arrs.pop(1)`
+
 - remobe:从列表中删除一个元素，不返回任何值
-- reverse:按相反顺序排列
-`arrs.reverse` 修改列表，但是不返回任何值
-- sort:排序
-`arrs.sort()`  不返回任何值
-要想有返回值，可以使用`y=sorted(arrs)`
+
+- reverse:按相反顺序排列: `arrs.reverse` 修改列表，但是不返回任何值
+
+- sort:排序: `arrs.sort()`  不返回任何值,要想有返回值，可以使用`y=sorted(arrs)`
+
 - 高级排序(sort/sorted函数接受两个可选参数：key和reverse)
 `arrs.sort(key=len)` 按照元素长度进行排序
 `arrs.sort(reverse=True)` 按照相反的顺序对列表进行排序
@@ -79,7 +78,7 @@ print('you {name} lll'.format(name=tt[1]))
 输出 `'**hello***'`
 - find 在字符串中查找子串，如果找到就返回子串所在的第一个字符的索引，负责返回-1。也可以通过`string.find('hello',2)`设置查找起点
 - join 用于合并序列的元素
-```
+```python
 s = ['usr', 'local', 'data']
 print('/'.join(s))
 # usr/local/data
@@ -90,7 +89,7 @@ print('/'.join(s))
 - strip 删除字符串开头和末尾的空白
 - translate 进行单字符替换
 使用translate前必须创建一个转换表，str调用maketrans,表示第一个参数中的字符都会替换为第二个参数的相应位置的字符，第三个参数是可选的，可以指定删除某些字符。
-```
+```python
 #表示将myStr中的'c'替换为'k'，'s'替换为'z'，并删除所有的't'
 table = str.makrtrans('cs','kz','t')
 myStr.translate(table)
@@ -103,7 +102,7 @@ myStr.translate(table)
 当替换副本中的值，原件不会受到影响，但是如果修改副本中的值，原件也会发生变化。
 为避免这种同时复制值以及其包含的所有值。使用模块copy中的函数deepcopy()
 - fromkeys() 创建一个只有key的字典
-```
+```python
 {}.fromkeys(['name','age'])
 {'age':None,'name':None}
 ```
@@ -122,7 +121,7 @@ myStr.translate(table)
 - for 循环 `for xx in xxx: ...`
 - range(）创建范围的内置函数 `range(start, end, [duration])`
 - zip() 并行迭代
-```
+```python
 names = ['codi', 'mray', 'kkk']
 ages = [18, 31, 55]
 print(list(zip(names, ages)))
@@ -138,7 +137,7 @@ for names, ages in zip(names, ages):
 - break 跳出循环
 - continue 结束当前迭代，并调到下一次迭代开头
 - 列表推导
-```
+```python
 [x * x for x in range(10) if x % 3 == 0]
 # [0, 9, 36, 81]
 ```
@@ -153,7 +152,7 @@ exec() 可以将字符串作为代码执行
 ## 抽象(函数)
 ####自定义函数
 - 给函数编写文档
-```
+```python
 def square(x):
   'calculates the squa...'
   return x * x
@@ -165,13 +164,13 @@ def square(x):
 要想收集关键字参数，可以使用**
 
 - 私有方法的定义使用两个下划线开头:`__`
-```
+```python
 class Secretive:
     def __inaccessible(self):
         print("hello world~")
 ```
 - 继承,在定义子类时，在类名后加`class 子类名(父类名)`
-```
+```python
 class Filter:
     def init(self):
         self.blocked = []
@@ -188,7 +187,7 @@ class SPAMFilter(Filter):
 
 - `**kwargs`的用法
 `**kwargs`允许将不定长度的键值对作为一个参数传递给一个函数
-```
+```python
 def greet_me(**kwargs):
     for key, value in kwargs.iterms():
         print("{0} == {1}".format(key, value))
@@ -198,7 +197,7 @@ def greet_me(**kwargs):
 
 ### 构造方法 `_init_`
 - 调用未关联的超类构造函数
-```
+```python
 class SongBird(Bird):
     def __init__(self):
         Bird.__init__(self)
@@ -207,7 +206,7 @@ class SongBird(Bird):
         print(self.sound)
 ```
 - 使用函数super
-```
+```python
 class SongBird(Bird):
     def __init__(self):
         super().__init__()
@@ -223,7 +222,7 @@ class SongBird(Bird):
 - 类方法的定义中包含类似于self的参数，通常为cls
 
 #### 使用装饰器指定方法类型，之后可以直接使用类名进行调用
-```
+```python
 class MyClass:
     @staticmethod
     def sta_me():
@@ -250,7 +249,7 @@ MyClass.clas_me()
 #### 模块导入
 `from drawing import shapes` 这种导入方法最方便
 #### yaml
-```
+```python
 import yaml
 logs = yaml.load(open("/Users/cody/Desktop/test/python/value1.yaml").read())
 print(logs['image'])
