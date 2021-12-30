@@ -14,6 +14,54 @@ tags:
 > - Create Date: 2020-07-08
 > - Update Date: 2021-02-08
 
+## scala部署
+#### scala项目创建、编译、打包及运行
+1. 使用idea基于sbt创建scala项目, 然后在src/main/scala目录下创建测试程序：
+```java
+object TestProject {
+  def main(args: Array[String]): Unit = {
+    print("hello Scala")
+  }
+}
+```
+
+2. 在项目根目录下执行`sbt compile`
+![编译](https://tva1.sinaimg.cn/large/008i3skNgy1gvmy83gs96j613507ignp02.jpg)
+
+3. 运行`sbt run`
+![运行](https://tva1.sinaimg.cn/large/008i3skNgy1gvmy99fnnxj60nq03paat02.jpg)
+
+4. 打包`sbt package`
+![打包](https://tva1.sinaimg.cn/large/008i3skNgy1gvmy9r59c4j60md02cwex02.jpg)
+
+5. 最后在target目录下可以看到打包好的jar包，可以使用`jar tvf target/scala-2.12/user_base_log_2.12-0.1.jar`查看目录结构
+
+6. 运行程序`scala target/scala-2.12/user_base_log_2.12-0.1.jar`，或者直接用java来执行,需要引入scala的一个类库：`java -classpath /usr/local/Cellar/scala@2.12/2.12.12/libexec/lib/scala-library.jar:target/scala-2.12/user_base_log_2.12-0.1.jar TestProject`
+
+#### 打包所有依赖
+1. 增加`project/plugins.sbt`文件,文件内容
+```
+addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.7")
+```
+
+2. 项目根目录下执行`sbt clean compile assembly`
+
+3. 如果报文件重复的异常，需要对重复文件进行处理，在`build.sbt`文件中增加如下内容：
+```
+assemblyMergeStrategy in assembly := {
+  case PathList("LZ4BlockInputStream.class") => MergeStrategy.discard
+  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+  case x => MergeStrategy.first
+}
+```
+
+#### flink-sql-client
+例：通过flink-sql-client消费kafka中的json数据
+1. 在`/usr/local/Cellar/apache-flink/1.12.0/libexec`下新建kafka-lib的目录用于存放jar包
+2. 放入jar包：flink-connector-kafka_2.12-1.12.0.jar、flink-json-1.12.0.jar、kafka-clients-2.4.1.jar，注意版本
+3. 启动cli: `./bin/sql-client.sh embedded -l kafka-lib`
+4. 建表、查询，`select count(1) from xxx`
+
 ## 快学scala
 
 #### 基础一
@@ -58,7 +106,7 @@ try {
 
 - 多参数列表（柯里化）： 方法可以定义多个参数列表，当使用较少的参数列表调用多参数列表的方式时，会产生一个新的函数，该函数接受剩余的参数列表作为其参数，这被称为柯里化。
 
-- 案例列 case class: 
+- 案例列 case class:
 	- 在实例化案例类的时候，不需要使用new关键字，因为案例类有一个默认的apply方法来负责对象的创建。且在创建包含参数的案例类时，这些参数是public val（即不能被再次赋值）
 	- 案例类在比较的时候是按值比较而非按引用比较
 
@@ -182,7 +230,7 @@ until (x == 0) {
 	x -= 1
 	println(x)
 }
-``` 
+```
 
 #### 基础四（集合、模式匹配、案例类）
 - Mutable集合继承关系图
