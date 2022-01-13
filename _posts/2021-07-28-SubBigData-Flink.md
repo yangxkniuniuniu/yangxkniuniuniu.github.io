@@ -136,6 +136,122 @@ Tirgger需要实现以下5个方法：
 - `PRUGE`: 窗口内部数据清除且不触发计算
 - `FIRE_AND_PURGE`: 触发计算并清除对应的数据
 
+> example: 实现统计当前小时的word count，在为达到窗口结束时间前，每1分钟或者读取到元素数量>=100时进行窗口计算并输出
+主程序:
+
+```java
+object FlinkStreamDemo {
+  def main(args: Array[String]): Unit = {
+    val properties = new Properties()
+    properties.setProperty("bootstrap.servers", "localhost:9092")
+    properties.setProperty("group.id", "test")
+    val myConsumer = new FlinkKafkaConsumer[String]("test2", new SimpleStringSchema(), properties)
+    val env = StreamExecutionEnvironment.getExecutionEnvironment
+    val src: DataStream[String] = env.addSource(myConsumer)
+    val windowCounts = src.flatMap(_.split("\\s"))
+      .map(x => (x, 1))
+      .keyBy(_._1)
+      .window(TumblingProcessingTimeWindows.of(Time.hours(1L)))
+      .trigger(new CustomTrigger[TimeWindow](3, 5000))
+      .reduce(new CustomReduceFuncion(), new CustomWindowFunction())
+    windowCounts.addSink(new CustomPrintSinkFunction())
+    env.execute("Socket Window WordCount")
+  }
+}
+class CustomPrintSinkFunction extends RichSinkFunction[String] {
+  override def invoke(value: String, context: SinkFunction.Context): Unit = {
+    println(s"${value}")
+  }
+}
+class CustomReduceFuncion extends ReduceFunction[(String, Int)] {
+  override def reduce(value1: (String, Int), value2: (String, Int)): (String, Int) = {
+    (value1._1, value1._2 + value2._2)
+  }
+}
+class CustomWindowFunction extends ProcessWindowFunction[(String, Int), String, String, TimeWindow] {
+  override def process(key: String, context: Context, elements: Iterable[(String, Int)], out: Collector[String]): Unit = {
+    for (x <- elements) {
+      val newEle = s"${context.window.getStart.toString} ${x._1} ${x._2}"
+      out.collect(newEle)
+    }
+  }
+}
+```
+
+自定义Trigger
+```java
+class CustomTrigger[T <: Window](val maxNumber: Long, val inteval: Long) extends Trigger[Object, T]{
+  private final val countStateDesc = new ReducingStateDescriptor[Long]("count-fire", new Sum(), TypeInformation.of(new TypeHint[Long] {}))
+  private final val timeStateDesc = new ReducingStateDescriptor[Long]("time-fire", new Min(), TypeInformation.of(new TypeHint[Long] {}))
+  override def onElement(element: Object, timestamp: Long, window: T, ctx: Trigger.TriggerContext): TriggerResult = {
+    val countState = ctx.getPartitionedState(countStateDesc)
+    countState.add(1L)
+
+    if (countState.get() >= maxNumber) {
+      countState.clear()
+      return TriggerResult.FIRE
+    }
+
+    val fireTimestampState = ctx.getPartitionedState(timeStateDesc)
+    if (fireTimestampState.get() == null.asInstanceOf[Long]) {
+      val start = timestamp - (timestamp % inteval)
+      val end = start + inteval
+      ctx.registerProcessingTimeTimer(end)
+      fireTimestampState.add(end)
+    }
+    TriggerResult.CONTINUE
+  }
+
+  override def onProcessingTime(time: Long, window: T, ctx: Trigger.TriggerContext): TriggerResult = {
+    val fireTimestampState = ctx.getPartitionedState(timeStateDesc)
+    val fireTimestamp = fireTimestampState.get()
+    if (fireTimestamp != null.asInstanceOf[Long] && (fireTimestamp - time).abs < 100) {
+      fireTimestampState.clear()
+      fireTimestampState.add(fireTimestamp + inteval)
+      ctx.registerProcessingTimeTimer(fireTimestamp + inteval)
+      return TriggerResult.FIRE
+    }
+    return TriggerResult.CONTINUE
+  }
+
+  override def onEventTime(time: Long, window: T, ctx: Trigger.TriggerContext): TriggerResult = {
+    TriggerResult.CONTINUE
+  }
+
+  override def clear(window: T, ctx: Trigger.TriggerContext): Unit = {
+    val countState = ctx.getPartitionedState(countStateDesc)
+    val fireTimestampState = ctx.getPartitionedState(timeStateDesc)
+    val fireTimestamp = fireTimestampState.get()
+    if (countState.get() != null.asInstanceOf[Long]) {
+      countState.clear()
+    }
+    if (fireTimestamp != null.asInstanceOf[Long]) {
+      ctx.deleteProcessingTimeTimer(fireTimestamp)
+      fireTimestampState.clear()
+    }
+  }
+
+  override def canMerge: Boolean = true
+
+  override def onMerge(window: T, ctx: Trigger.OnMergeContext): Unit = {
+    ctx.mergePartitionedState(timeStateDesc)
+    ctx.mergePartitionedState(countStateDesc)
+  }
+
+  private class Sum extends ReduceFunction[Long] {
+    override def reduce(value1: Long, value2: Long): Long = {
+      return value1 + value2
+    }
+  }
+  
+  private class Min extends ReduceFunction[Long] {
+    override def reduce(value1: Long, value2: Long): Long = {
+      return Math.min(value1, value2)
+    }
+  }
+}
+```
+
 
 ## Flink算子
 
