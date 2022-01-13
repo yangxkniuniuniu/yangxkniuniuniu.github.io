@@ -136,9 +136,12 @@ Tirgger需要实现以下5个方法：
 - `PRUGE`: 窗口内部数据清除且不触发计算
 - `FIRE_AND_PURGE`: 触发计算并清除对应的数据
 
-> example: 实现统计当前小时的word count，在为达到窗口结束时间前，每1分钟或者读取到元素数量>=100时进行窗口计算并输出
-主程序:
+> example: 实现统计当前小时的word count，在未达到窗口结束时间前，每1分钟或者读取到每个key的元素数量>=100时进行窗口计算并输出
 
+在keyedStream流程使用状态的时候需要注意，flink会为每个key在特定的窗口上都会维护一个状态数据。`TriggerContext.getPartitionedState(StateDescriptor<S, ?> stateDescriptor)`方法的源码注释上有这样一句话
+`Retrieves a {@link State} object that can be used to interact with fault-tolerant state that is scoped to the window and key of the current trigger invocation.` 。所以当运行从窗口1到窗口2而，会重新生成一个状态数据。
+
+主程序:
 ```java
 object FlinkStreamDemo {
   def main(args: Array[String]): Unit = {
@@ -152,22 +155,25 @@ object FlinkStreamDemo {
       .map(x => (x, 1))
       .keyBy(_._1)
       .window(TumblingProcessingTimeWindows.of(Time.hours(1L)))
-      .trigger(new CustomTrigger[TimeWindow](3, 5000))
+      .trigger(new CustomTrigger[TimeWindow](100, 60000))
       .reduce(new CustomReduceFuncion(), new CustomWindowFunction())
     windowCounts.addSink(new CustomPrintSinkFunction())
-    env.execute("Socket Window WordCount")
+    env.execute("Kafka Window WordCount")
   }
 }
+
 class CustomPrintSinkFunction extends RichSinkFunction[String] {
   override def invoke(value: String, context: SinkFunction.Context): Unit = {
     println(s"${value}")
   }
 }
+
 class CustomReduceFuncion extends ReduceFunction[(String, Int)] {
   override def reduce(value1: (String, Int), value2: (String, Int)): (String, Int) = {
     (value1._1, value1._2 + value2._2)
   }
 }
+
 class CustomWindowFunction extends ProcessWindowFunction[(String, Int), String, String, TimeWindow] {
   override def process(key: String, context: Context, elements: Iterable[(String, Int)], out: Collector[String]): Unit = {
     for (x <- elements) {
@@ -182,16 +188,19 @@ class CustomWindowFunction extends ProcessWindowFunction[(String, Int), String, 
 ```java
 class CustomTrigger[T <: Window](val maxNumber: Long, val inteval: Long) extends Trigger[Object, T]{
   private final val countStateDesc = new ReducingStateDescriptor[Long]("count-fire", new Sum(), TypeInformation.of(new TypeHint[Long] {}))
+  // 使用Min()函数来保证预设的间隔和窗口的正常触发时间不冲突且窗口能正常触发，如下一个定时器的时间>窗口的触发时间，这时就要保证窗口能正常被触发
   private final val timeStateDesc = new ReducingStateDescriptor[Long]("time-fire", new Min(), TypeInformation.of(new TypeHint[Long] {}))
   override def onElement(element: Object, timestamp: Long, window: T, ctx: Trigger.TriggerContext): TriggerResult = {
     val countState = ctx.getPartitionedState(countStateDesc)
     countState.add(1L)
 
+    // 当前key下元素数量超出预设值后触发窗口计算
     if (countState.get() >= maxNumber) {
       countState.clear()
       return TriggerResult.FIRE
     }
 
+    // 当元素进入到一个新的窗口时，注册新的定时器
     val fireTimestampState = ctx.getPartitionedState(timeStateDesc)
     if (fireTimestampState.get() == null.asInstanceOf[Long]) {
       val start = timestamp - (timestamp % inteval)
@@ -205,6 +214,8 @@ class CustomTrigger[T <: Window](val maxNumber: Long, val inteval: Long) extends
   override def onProcessingTime(time: Long, window: T, ctx: Trigger.TriggerContext): TriggerResult = {
     val fireTimestampState = ctx.getPartitionedState(timeStateDesc)
     val fireTimestamp = fireTimestampState.get()
+    // 实际测试时发现time并不能完全等于定时器的设定时间，如fireTimestamp=1642060800000，time=1642060799999，所以这地方暂时允许0.1s内的误差
+    // 定时事件到达，触发窗口计算并将下一次触发时间写入状态中
     if (fireTimestamp != null.asInstanceOf[Long] && (fireTimestamp - time).abs < 100) {
       fireTimestampState.clear()
       fireTimestampState.add(fireTimestamp + inteval)
@@ -243,13 +254,24 @@ class CustomTrigger[T <: Window](val maxNumber: Long, val inteval: Long) extends
       return value1 + value2
     }
   }
-  
+
   private class Min extends ReduceFunction[Long] {
     override def reduce(value1: Long, value2: Long): Long = {
       return Math.min(value1, value2)
     }
   }
 }
+```
+
+输出结果如下:
+```csv
+1642060800000 e 1
+1642060800000 e 2
+1642060800000 e 3
+1642060800000 e 5
+1642060800000 e 5
+1642060800000 c 1
+1642060800000 e 5
 ```
 
 
