@@ -29,3 +29,9 @@ tags:
     - 3.创建topic：kafka-topic-create -zookeeper localhost:2181 -replication-factor 1 -partitions 1 -topic test
     - 4.发送消息： kafka-console-producer -broker-list localhost:9092 -topic test
     - 5.消费消息：kafka-console-consumer -bootstrap-server localhost:9092 -topic test -from-beginning
+
+#### kafka常用消费代码示例
+![kafka消费](https://tva1.sinaimg.cn/large/e6c9d24egy1h1jynzqokfj20yi0is0vd.jpg)
+
+#### kafka rebalance
+[consumer group & rebalance](https://www.lixueduan.com/post/kafka/11-consumer-group-rebalance/)

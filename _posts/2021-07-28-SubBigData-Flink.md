@@ -139,7 +139,7 @@ Tirgger需要实现以下5个方法：
 > example: 实现统计当前小时的word count，在未达到窗口结束时间前，每1分钟或者读取到每个key的元素数量>=100时进行窗口计算并输出
 
 在keyedStream流程使用状态的时候需要注意，flink会为每个key在特定的窗口上都会维护一个状态数据。`TriggerContext.getPartitionedState(StateDescriptor<S, ?> stateDescriptor)`方法的源码注释上有这样一句话
-`Retrieves a {@link State} object that can be used to interact with fault-tolerant state that is scoped to the window and key of the current trigger invocation.` 。所以当运行从窗口1到窗口2而，会重新生成一个状态数据。
+`Retrieves a {@link State} object that can be used to interact with fault-tolerant state that is scoped to the window and key of the current trigger invocation.` 。所以当运行从窗口1到窗口2后，会重新生成一个状态数据。
 
 主程序:
 ```java
