@@ -20,6 +20,10 @@ tags:
 ## 架构详解
 
 ## Flink窗口计算
+#### Watermark
+Windows -----> Watermark -----> allowLateNess -----> sideOutPut
+用Windows把流数据分块处理，用`Watermark`确定什么时候不再等待更早的数据/触发窗口进行计算，用`allowLateNess`将窗口关闭时间再延迟一段时间，用`sideOutPut`最后兜底把数据导出到其他地方。
+
 #### window生命周期
 一般来说，每一个窗口会有一个`Trigger`和一个`Function`。`Function`决定了窗口里面的数据会被如何进行计算处理，而`Trigger`指定了何时出发窗口计算的条件。触发器同时也可以清除任何在窗口创建后和移除前时间段内的数据，这个地方需要注意，触发器仅会清除窗口内的元素，而不会清除窗口的元数据信息，因此，新的数据仍然可以加入到窗口中。
 除此之类，还可以指定`Evictor`用于在窗口被触发后、窗口计算前，进行数据的筛选移除操作，类似于`filter`操作。
