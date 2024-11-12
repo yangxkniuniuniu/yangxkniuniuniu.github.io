@@ -48,6 +48,11 @@ tags:
 	source ~/zshrc
 	然后使用  j   kafka   可以找到最近使用的kafka文件夹，实现快速跳转
 
+#### 6. 其他插件
+-- zsh-autosuggestions
+-- zsh-syntax-highlighting
+-- colorls（在安装ruby后使用`gem install colorls`命令安装）
+
 
 #### 3.Tmux（终端复用）
 ###### 常用命令
