@@ -18,6 +18,7 @@ tags:
 
 ## 数仓基础
 
+### 数仓基建  
 1. 什么是数据仓库  
 以数据建模理念为基础，以消除数据孤岛为目的，通过一系列标准方法和工具，解决大数据计算中如质量、复用、扩展、成本等问题，驱动业务发展。
 
@@ -42,10 +43,10 @@ tags:
 
 - 事实
 
-1. OneData体系  
+4. OneData体系  
 OneData体系是阿里数据中台的核心方法论，其包含了三个方面内容：OneModel即建立企业统一的数据公共层，从设计、开发、部署和使用上保障了数据口径规范和统一，实现数据资产全链路管理，提供标准数据输出。OneID即建立业务实体要素资产化为核心，实现全域链接、标签萃取、立体画像，其数据服务理念根植于心，强调业务模式。OneService即数据被整合和计算好之后，需要提供给产品和应用进行数据消费，为了更好的性能和体验，需要构建数据服务层，通过统一的接口服务化方式对外提供数据服务。 
 
-2. 模型调优  
+5. 模型调优  
 - 完善度： 应用层访问汇总层数据的查询比例、跨层应用率、是否可以快速响应业务方的需求  
 
 - 复用度：模型引用系数->模型被读取并产出下游模型的平均数量  
@@ -62,9 +63,7 @@ OneData体系是阿里数据中台的核心方法论，其包含了三个方面�
 
 - 低成本  
 
-
-1. 数仓基建  
-2. 数据治理  
+### 数据治理  
 	a. 数据规范
 	b. 元数据管理
 	c. 主数据管理
@@ -72,8 +71,7 @@ OneData体系是阿里数据中台的核心方法论，其包含了三个方面�
 	e. 数据质量管理：数据产生/数据接入/数据存储/数据的处理和分析/数据传输/数据展现
 	f. 数据成本管理
 
-3. 指标体系  
-
+### 指标体系
 # spark相关
 1. spark的程序运行流程、调度流程、本地化调度、内存管理模型  
 2. sparksql的解析流程  
@@ -83,33 +81,31 @@ OneData体系是阿里数据中台的核心方法论，其包含了三个方面�
 	优化器（RBO、CBO、AQE）:
 	[优化器](https://juejin.cn/post/7112251991120609311)
 
-动态分区裁剪、动态优化数据倾斜、动态选择join策略相关参数
+3. 动态分区裁剪、动态优化数据倾斜、动态选择join策略相关参数
+- AQE开关
+	- `spark.sql.adaptive.enabled=true` 默认false，为true时开启自适应查询，在运行过程中基于统计信息重新优化查询计划  
+	- `spark.sql.adaptive.forceApply=true` 默认false，自适应查询在没有shuffle或子查询时将不适用，设置为true将始终使用  
+	- `spark.sql.adaptive.advisoryPartitionSizeInBytes=64M `默认64MB,开启自适应执行后每个分区的大小。合并小分区和分割倾斜分区都会用到这个参数
 
-**AQE开关**
-- `spark.sql.adaptive.enabled=true` 默认false，为true时开启自适应查询，在运行过程中基于统计信息重新优化查询计划  
-- `spark.sql.adaptive.forceApply=true` 默认false，自适应查询在没有shuffle或子查询时将不适用，设置为true将始终使用  
-- `spark.sql.adaptive.advisoryPartitionSizeInBytes=64M `默认64MB,开启自适应执行后每个分区的大小。合并小分区和分割倾斜分区都会用到这个参数
+- 开启合并shuffle分区
+	- `spark.sql.adaptive.coalescePartitions.enabled=true ` 当spark.sql.adaptive.enabled也开启时，合并相邻的shuffle分区，避免产生过多小task  
+	- `spark.sql.adaptive.coalescePartitions.initialPartitionNum=200` 合并之前shuffle分区数的初始值，默认值是spark.sql.shuffle.partitions，可设置高一些  
+	- `spark.sql.adaptive.coalescePartitions.minPartitionNum=20` 合并后的最小shuffle分区数。默认值是Spark集群的默认并行性  
+	- `spark.sql.adaptive.maxNumPostShufflePartitions=500` reduce分区最大值，默认500，可根据资源调整  
 
-**开启合并shuffle分区**
-- `spark.sql.adaptive.coalescePartitions.enabled=true ` 当spark.sql.adaptive.enabled也开启时，合并相邻的shuffle分区，避免产生过多小task  
-- `spark.sql.adaptive.coalescePartitions.initialPartitionNum=200` 合并之前shuffle分区数的初始值，默认值是spark.sql.shuffle.partitions，可设置高一些  
-- `spark.sql.adaptive.coalescePartitions.minPartitionNum=20` 合并后的最小shuffle分区数。默认值是Spark集群的默认并行性  
-- `spark.sql.adaptive.maxNumPostShufflePartitions=500` reduce分区最大值，默认500，可根据资源调整  
+- 开启动态调整Join策略
+	- `spark.sql.adaptive.join.enabled=true` 与spark.sql.adaptive.enabled都开启的话，开启AQE动态调整Join策略
 
-**开启动态调整Join策略**
-- `spark.sql.adaptive.join.enabled=true` 与spark.sql.adaptive.enabled都开启的话，开启AQE动态调整Join策略
-
-**开启优化数据倾斜**
-- `spark.sql.adaptive.skewJoin.enabled=true` 与spark.sql.adaptive.enabled都开启的话，开启AQE动态处理Join时数据倾斜
-- `spark.sql.adaptive.skewedPartitionMaxSplits=5` 处理一个倾斜Partition的task个数上限，默认值为5；
-- `spark.sql.adaptive.skewedPartitionRowCountThreshold=1000000` 倾斜Partition的行数下限，即行数低于该值的Partition不会被当作倾斜，默认值一千万
-- `spark.sql.adaptive.skewedPartitionSizeThreshold=64M` 倾斜Partition的大小下限，即大小小于该值的Partition不会被当做倾斜，默认值64M
-- `spark.sql.adaptive.skewedPartitionFactor=5` 倾斜因子，默认为5。判断是否为倾斜的 Partition。如果一个分区(DataSize>64M*5) || (DataNum>(1000w*5)),则视为倾斜分区。
-- `spark.shuffle.statistics.verbose=true` 默认false，打开后MapStatus会采集每个partition条数信息，用于倾斜处理
+- 开启优化数据倾斜
+	- `spark.sql.adaptive.skewJoin.enabled=true` 与spark.sql.adaptive.enabled都开启的话，开启AQE动态处理Join时数据倾斜
+	- `spark.sql.adaptive.skewedPartitionMaxSplits=5` 处理一个倾斜Partition的task个数上限，默认值为5；
+	- `spark.sql.adaptive.skewedPartitionRowCountThreshold=1000000` 倾斜Partition的行数下限，即行数低于该值的Partition不会被当作倾斜，默认值一千万
+	- `spark.sql.adaptive.skewedPartitionSizeThreshold=64M` 倾斜Partition的大小下限，即大小小于该值的Partition不会被当做倾斜，默认值64M
+	- `spark.sql.adaptive.skewedPartitionFactor=5` 倾斜因子，默认为5。判断是否为倾斜的 Partition。如果一个分区(DataSize>64M*5) || (DataNum>(1000w*5)),则视为倾斜分区。
+	- `spark.shuffle.statistics.verbose=true` 默认false，打开后MapStatus会采集每个partition条数信息，用于倾斜处理
 
 
-3. sparksql怎么处理count distinct
-![count distinct在spark中的运行机制](https://blog.csdn.net/nanfeizhenkuangou/article/details/135210504)
+3. sparksql怎么处理count distinct：[count distinct在spark中的运行机制](https://blog.csdn.net/nanfeizhenkuangou/article/details/135210504)
 
 # flink相关
 
@@ -126,9 +122,6 @@ OneData体系是阿里数据中台的核心方法论，其包含了三个方面�
 	`set hive.auto.convert.sortmerge.join=true;`
 	`set hive.optimize.bucketmapjoin = true;`
 	`set hive.optimize.bucketmapjoin.sortedmerge = true;`
-
-
-
 
 
 # 其他
