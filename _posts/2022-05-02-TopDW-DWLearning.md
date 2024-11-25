@@ -82,16 +82,17 @@ OneData体系是阿里数据中台的核心方法论，其包含了三个方面�
 	[优化器](https://juejin.cn/post/7112251991120609311)
 
 3. 动态分区裁剪、动态优化数据倾斜、动态选择join策略相关参数
+
 - AQE开关
-	- `spark.sql.adaptive.enabled=true` 默认false，为true时开启自适应查询，在运行过程中基于统计信息重新优化查询计划  
-	- `spark.sql.adaptive.forceApply=true` 默认false，自适应查询在没有shuffle或子查询时将不适用，设置为true将始终使用  
+	- `spark.sql.adaptive.enabled=true` 默认false，为true时开启自适应查询，在运行过程中基于统计信息重新优化查询计划
+	- `spark.sql.adaptive.forceApply=true` 默认false，自适应查询在没有shuffle或子查询时将不适用，设置为true将始终使用
 	- `spark.sql.adaptive.advisoryPartitionSizeInBytes=64M `默认64MB,开启自适应执行后每个分区的大小。合并小分区和分割倾斜分区都会用到这个参数
 
 - 开启合并shuffle分区
-	- `spark.sql.adaptive.coalescePartitions.enabled=true ` 当spark.sql.adaptive.enabled也开启时，合并相邻的shuffle分区，避免产生过多小task  
-	- `spark.sql.adaptive.coalescePartitions.initialPartitionNum=200` 合并之前shuffle分区数的初始值，默认值是spark.sql.shuffle.partitions，可设置高一些  
-	- `spark.sql.adaptive.coalescePartitions.minPartitionNum=20` 合并后的最小shuffle分区数。默认值是Spark集群的默认并行性  
-	- `spark.sql.adaptive.maxNumPostShufflePartitions=500` reduce分区最大值，默认500，可根据资源调整  
+	- `spark.sql.adaptive.coalescePartitions.enabled=true ` 当spark.sql.adaptive.enabled也开启时，合并相邻的shuffle分区，避免产生过多小task
+	- `spark.sql.adaptive.coalescePartitions.initialPartitionNum=200` 合并之前shuffle分区数的初始值，默认值是spark.sql.shuffle.partitions，可设置高一些
+	- `spark.sql.adaptive.coalescePartitions.minPartitionNum=20` 合并后的最小shuffle分区数。默认值是Spark集群的默认并行性
+	- `spark.sql.adaptive.maxNumPostShufflePartitions=500` reduce分区最大值，默认500，可根据资源调整
 
 - 开启动态调整Join策略
 	- `spark.sql.adaptive.join.enabled=true` 与spark.sql.adaptive.enabled都开启的话，开启AQE动态调整Join策略
@@ -101,7 +102,7 @@ OneData体系是阿里数据中台的核心方法论，其包含了三个方面�
 	- `spark.sql.adaptive.skewedPartitionMaxSplits=5` 处理一个倾斜Partition的task个数上限，默认值为5；
 	- `spark.sql.adaptive.skewedPartitionRowCountThreshold=1000000` 倾斜Partition的行数下限，即行数低于该值的Partition不会被当作倾斜，默认值一千万
 	- `spark.sql.adaptive.skewedPartitionSizeThreshold=64M` 倾斜Partition的大小下限，即大小小于该值的Partition不会被当做倾斜，默认值64M
-	- `spark.sql.adaptive.skewedPartitionFactor=5` 倾斜因子，默认为5。判断是否为倾斜的 Partition。如果一个分区(DataSize>64M*5) || (DataNum>(1000w*5)),则视为倾斜分区。
+	- `spark.sql.adaptive.skewedPartitionFactor=5` 倾斜因子，默认为5。判断是否为倾斜的 Partition。如果一个分区`(DataSize>64M*5)` 或`(DataNum>(1000w*5))`,则视为倾斜分区。
 	- `spark.shuffle.statistics.verbose=true` 默认false，打开后MapStatus会采集每个partition条数信息，用于倾斜处理
 
 
