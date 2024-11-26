@@ -13,9 +13,12 @@ tags:
 ---
 
 > - Create Date: 2019-12-03
-> - Update Date: 2019-12-03
+> - Update Date: 2024-11-26
 
 > **[上层URL: 大数据学习笔记](http://owlcity.top/2019/12/01/TopBigData-BigdataLearning/)**
+
+> 参考文档：
+> 1. [kafka原理详解](https://www.cnblogs.com/dreamroute/p/13092117.html)
 
 ## Kafka
 #### 本地安装与部署
