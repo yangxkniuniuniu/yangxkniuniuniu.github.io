@@ -72,7 +72,10 @@ OneData体系是阿里数据中台的核心方法论，其包含了三个方面�
 	f. 数据成本管理
 
 ### 指标体系
-# spark相关
+
+# 大数据技术
+
+## spark相关
 1. spark的程序运行流程、调度流程、本地化调度、内存管理模型  
 2. sparksql的解析流程  
 	![sparksql解析流程1](https://p.ipic.vip/fmhvp4.jpg)
@@ -108,12 +111,17 @@ OneData体系是阿里数据中台的核心方法论，其包含了三个方面�
 
 3. sparksql怎么处理count distinct：[count distinct在spark中的运行机制](https://blog.csdn.net/nanfeizhenkuangou/article/details/135210504)
 
-# flink相关
+## flink相关
 
-# sql相关
-1. 滑动窗口
-2. 间隔连续问题
-3. 分桶来解决大表关联问题
+## kafka相关
+[kafka原理详解](https://owlcity.top/2015/01/02/SubBigData-Kafka/)
+
+## sql相关
+
+### sql练习
+
+### sql总结
+1. 分桶来解决大表关联问题
 	1. 建分桶表
 		`CLUSTERED BY (name) SORTED BY (name)INTO 5 BUCKETS`
 	2. 插入数据
@@ -123,6 +131,9 @@ OneData体系是阿里数据中台的核心方法论，其包含了三个方面�
 	`set hive.auto.convert.sortmerge.join=true;`
 	`set hive.optimize.bucketmapjoin = true;`
 	`set hive.optimize.bucketmapjoin.sortedmerge = true;`
+
+
+
 
 
 # 其他
@@ -159,8 +170,8 @@ if __name__ = '__main__':
   mybitmap.append(800)
   mybitmap.append(19)
   mybitmap.append(80)
-  mybitmap.find(800) # True
-  mybitmap.find(77) # Flase
+  mybitmap.find(800)
+  mybitmap.find(77)
   mybitmap.delete(19)
 ```
 
